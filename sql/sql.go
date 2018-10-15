@@ -15,6 +15,8 @@ const WTYPE_WORK = 3
 const WTYPE_WORK_MEET = 4
 const WTYPE_WORK_SUPP = 5
 
+var DBc *gorm.DB
+
 type Customer struct {
 	gorm.Model
 	Name string `gorm:"unique;not null"`
@@ -22,8 +24,8 @@ type Customer struct {
 
 	Projects []Project `gorm:"foreignkey:ProjRef"`
 
-	ContactName  string `gorm:"unique"`
-	ContactEmail string `gorm:"unique"`
+	ContactName  string
+	ContactEmail string
 }
 
 type Project struct {
@@ -63,17 +65,33 @@ type Tag struct {
 	Entries []*Entry `gorm:"many2many:entry_tags;"`
 }
 
-func DbInit(DbType string, DbPath string) (*gorm.DB, error) {
+func DbInit(DbType string, DbPath string) {
+	var err error
+
 	fmt.Println("Initializing Database...")
-	db, err := gorm.Open(DbType, DbPath)
+	DBc, err = gorm.Open(DbType, DbPath)
 	if err != nil {
-		return nil, err
+		DBc.Close()
+		panic("DB open Failed")
 	}
-	defer db.Close()
+	//	defer DBc.Close()
 
 	// Migrate the schema
 	fmt.Println("Running database automigration...")
-	db.AutoMigrate(&Customer{}, &Project{}, &Entry{}, &Tag{})
+	DBc.AutoMigrate(&Customer{}, &Project{}, &Entry{}, &Tag{})
 
-	return db, err
+}
+
+func DBPreload() {
+	var customer Customer
+
+	if err := DBc.Where("name = ?", "Cra").First(&customer).Error; err != nil {
+		fmt.Println("Preloading database data")
+		DBc.Create(&Customer{Name: "Cra", Rate: 40, ContactEmail: "pkouril@cra.cz", ContactName: "Premysl Kouril"})
+		DBc.Create(&Customer{Name: "Pixel", Rate: 30, ContactEmail: "mderer@pixelfederation.com", ContactName: "Marek Derer"})
+		DBc.Create(&Customer{Name: "IB", Rate: 40, ContactEmail: "wth@ibuildings.it", ContactName: ""})
+		DBc.Create(&Customer{Name: "Freal", Rate: 40, ContactEmail: "jbombiak@vederie.sk", ContactName: "Jozef Bombiak"})
+	} else {
+		fmt.Println("Database data loaded already")
+	}
 }

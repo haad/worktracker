@@ -4,36 +4,68 @@ import (
 	"fmt"
 
 	"github.com/spf13/cobra"
+	"github.com/xlab/tablewriter"
+
+	"github.com/haad/worktracker/sql"
 )
 
-var ProjectName string
-var ProjectOwnerName string
-
 func init() {
-	rootCmd.AddCommand(ProjCmd)
-	ProjCmd.AddCommand(ProjCreateCmd)
+	var projName string
+	var projCustName string
 
-	ProjCreateCmd.Flags().StringVarP(&ProjectName, "name", "n", "", "Project name")
-	ProjCreateCmd.Flags().StringVarP(&ProjectOwnerName, "customer", "c", "", "Project customer name, needs to be created before.")
-	ProjCreateCmd.MarkFlagRequired("name")
-	ProjCreateCmd.MarkFlagRequired("customer")
+	var projCmd = &cobra.Command{
+		Use:   "project",
+		Short: "Manipulate worktracker projects",
+		Long:  `Create project under which we can track work`,
+	}
+
+	var projCreateCmd = &cobra.Command{
+		Use:   "create",
+		Short: "Create project with given name",
+		Long:  `Create project which belongs to one customer`,
+		Run: func(cmd *cobra.Command, args []string) {
+			ProjectCreate(projName, projCustName)
+		},
+	}
+	projCreateCmd.Flags().StringVarP(&projName, "name", "n", "", "Project name")
+	projCreateCmd.Flags().StringVarP(&projCustName, "customer", "c", "", "Project customer name, needs to be created before.")
+	projCreateCmd.MarkFlagRequired("name")
+	projCreateCmd.MarkFlagRequired("customer")
+
+	var projListCmd = &cobra.Command{
+		Use:   "list",
+		Short: "List projects",
+		Long:  `List created projects`,
+		Run: func(cmd *cobra.Command, args []string) {
+			ProjectList()
+		},
+	}
+
+	rootCmd.AddCommand(projCmd)
+	projCmd.AddCommand(projCreateCmd)
+	projCmd.AddCommand(projListCmd)
 }
 
-var ProjCmd = &cobra.Command{
-	Use:   "project",
-	Short: "Manipulate worktracker projects",
-	Long:  `Create project under which we can track work`,
+func ProjectCreate(name string, customerName string) {
+	var customer sql.Customer
+	fmt.Println("Creating customer:", name, "with default rate:", customer)
+	sql.DBc.Where("name = ?", customerName).First(&customer)
+	sql.DBc.Create(&sql.Project{Name: name, CustRef: customer.ID})
 }
 
-var ProjCreateCmd = &cobra.Command{
-	Use:   "create",
-	Short: "Create project with given name",
-	Long:  `Create project which belongs to one customer`,
-	Run: func(cmd *cobra.Command, args []string) {
-		ProjectCreate(ProjectName, ProjectOwnerName)
-	},
-}
+func ProjectList() {
+	var projects []sql.Project
 
-func ProjectCreate(name string, owner string) {
-	fmt.Println("Creating customer:", name, "with default rate:", owner)
+	table := tablewriter.CreateTable()
+	table.AddHeaders("Project Name", "Customer")
+
+	sql.DBc.Find(&projects)
+	fmt.Println("List existing customers: ")
+
+	for _, project := range projects {
+		fmt.Println("", sql.DBc.Model(&project).Related(&project.Customer))
+		table.AddRow(project.Name, project.Name)
+	}
+
+	fmt.Println(table.Render())
 }

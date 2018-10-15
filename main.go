@@ -15,11 +15,10 @@
 package main
 
 import (
+	"fmt"
 	//	"fmt"
 	//	"log"
 	//	"os"
-
-	"github.com/jinzhu/gorm"
 
 	"github.com/haad/worktracker/cmd"
 	"github.com/haad/worktracker/sql"
@@ -27,15 +26,12 @@ import (
 
 // Customer model for keeping info about given customer
 func main() {
-	var db *gorm.DB
-	var err error
+
+	sql.DbInit("sqlite3", "test.db")
+	sql.DBPreload()
 
 	cmd.Execute()
 
-	db, err = sql.DbInit("sqlite3", "test.db")
-	if err != nil {
-		panic("Failed to init DB...")
-	}
-
-	db.Close()
+	fmt.Println("Closing DB..")
+	sql.DBc.Close()
 }
