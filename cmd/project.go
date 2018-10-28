@@ -48,8 +48,9 @@ func init() {
 
 func ProjectCreate(name string, customerName string) {
 	var customer sql.Customer
-	fmt.Println("Creating customer:", name, "with default rate:", customer)
 	sql.DBc.Where("name = ?", customerName).First(&customer)
+
+	fmt.Println("Creating project:", name, "with default rate:", customer)
 	sql.DBc.Create(&sql.Project{Name: name, CustRef: customer.ID})
 }
 
@@ -59,12 +60,10 @@ func ProjectList() {
 	table := tablewriter.CreateTable()
 	table.AddHeaders("Project Name", "Customer")
 
-	sql.DBc.Find(&projects)
-	fmt.Println("List existing customers: ")
+	sql.DBc.Set("gorm:auto_preload", true).Find(&projects)
 
 	for _, project := range projects {
-		fmt.Println("", sql.DBc.Model(&project).Related(&project.Customer))
-		table.AddRow(project.Name, project.Name)
+		table.AddRow(project.Name, project.Customer.Name)
 	}
 
 	fmt.Println(table.Render())

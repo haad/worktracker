@@ -7,14 +7,6 @@ import (
 	_ "github.com/jinzhu/gorm/dialects/sqlite"
 )
 
-const WTYPE_CHORE = 0
-const WTYPE_FUN = 1
-const WTYPE_OSS = 2
-
-const WTYPE_WORK = 3
-const WTYPE_WORK_MEET = 4
-const WTYPE_WORK_SUPP = 5
-
 var DBc *gorm.DB
 
 type Customer struct {
@@ -46,7 +38,6 @@ type Entry struct {
 	Duration int64
 	Started  int64
 	Ended    int64
-	Type     uint
 	Desc     string
 	Billable bool
 
@@ -84,6 +75,8 @@ func DbInit(DbType string, DbPath string) {
 
 func DBPreload() {
 	var customer Customer
+	//var customers []Customer
+	//var projects []Project
 
 	if err := DBc.Where("name = ?", "Cra").First(&customer).Error; err != nil {
 		fmt.Println("Preloading database data")
@@ -94,4 +87,6 @@ func DBPreload() {
 	} else {
 		fmt.Println("Database data loaded already")
 	}
+
+	//
 }
