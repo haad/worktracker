@@ -14,7 +14,7 @@ type Customer struct {
 	Name string `gorm:"unique;not null"`
 	Rate uint
 
-	Projects []Project `gorm:"foreignkey:ProjRef"`
+	//Projects []Project `gorm:"foreignkey:CustomerID"`
 
 	ContactName  string
 	ContactEmail string
@@ -24,10 +24,8 @@ type Project struct {
 	gorm.Model
 	Name string
 
-	ProjRef uint
-
-	Customer Customer `gorm:"foreignkey:CustRef"`
-	CustRef  uint
+	Customer   Customer
+	CustomerID uint
 
 	Entries []Entry `gorm:"foreignkey:EntryRef"`
 }
@@ -67,6 +65,7 @@ func DbInit(DbType string, DbPath string) {
 	}
 	//	defer DBc.Close()
 
+	DBc.LogMode(true)
 	// Migrate the schema
 	fmt.Println("Running database automigration...")
 	DBc.AutoMigrate(&Customer{}, &Project{}, &Entry{}, &Tag{})
