@@ -6,7 +6,7 @@ import (
 	"github.com/spf13/cobra"
 	"github.com/xlab/tablewriter"
 
-	"github.com/haad/worktracker/sql"
+	"github.com/haad/worktracker/model/customer"
 )
 
 func init() {
@@ -64,52 +64,25 @@ func init() {
 }
 
 func CustomerCreate(name string, rate uint, contact string, email string) {
-	fmt.Println("Creating customer:", name, "with default rate:", rate)
-	sql.DBc.Create(&sql.Customer{Name: name, Rate: rate, ContactEmail: email, ContactName: contact})
+	customer.CustomerCreate(name, rate, contact, email)
 }
 
 func CustomerDelete(name string) {
-	var customer sql.Customer
-	var projects []sql.Project
-
-	sql.DBc.Where("name = ?", name).First(&customer)
-
-	fmt.Println("Deleting projects:")
-	sql.DBc.Where("customer_id = ?", customer.ID).Find(&projects)
-	for _, project := range projects {
-		sql.DBc.Unscoped().Delete(&project)
-	}
-
-	fmt.Println("Deleting customer:", name)
-	sql.DBc.Where("name = ?", name).Delete(&customer)
-	sql.DBc.Unscoped().Delete(&customer)
-}
-
-func customerGetProjects(id uint) string {
-	var projects []sql.Project
-	var p string
-
-	sql.DBc.Where("customer_id = ?", id).Find(&projects)
-	fmt.Println("projects:", projects)
-	for _, project := range projects {
-		p += project.Name + " "
-	}
-	return p
+	customer.CustomerDelete(name)
 }
 
 func CustomerList() {
-
-	var customers []sql.Customer
+	var customers []customer.CustomerInt
 
 	table := tablewriter.CreateTable()
 	table.AddHeaders("Customer Name", "Rate", "Contact Name", "Contact Email")
 
-	sql.DBc.Find(&customers)
+	customers = customer.CustomerList()
+
 	fmt.Println("List existing customers: ")
 
 	for _, customer := range customers {
-
-		table.AddRow(customer.Name, customer.Rate, customer.ContactName, customer.ContactEmail)
+		table.AddRow(customer.GetName(), customer.GetRate(), customer.GetContactName(), customer.GetContactEmail())
 	}
 	fmt.Println(table.Render())
 

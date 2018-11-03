@@ -6,7 +6,7 @@ import (
 	"github.com/spf13/cobra"
 	"github.com/xlab/tablewriter"
 
-	"github.com/haad/worktracker/sql"
+	"github.com/haad/worktracker/model/project"
 )
 
 func init() {
@@ -32,6 +32,17 @@ func init() {
 	projCreateCmd.MarkFlagRequired("name")
 	projCreateCmd.MarkFlagRequired("customer")
 
+	var projDelCmd = &cobra.Command{
+		Use:   "delete",
+		Short: "Delete projects",
+		Long:  `Delete created project`,
+		Run: func(cmd *cobra.Command, args []string) {
+			ProjectDelete(projName)
+		},
+	}
+	projDelCmd.Flags().StringVarP(&projName, "name", "n", "", "Project name")
+	projDelCmd.MarkFlagRequired("name")
+
 	var projListCmd = &cobra.Command{
 		Use:   "list",
 		Short: "List projects",
@@ -47,24 +58,23 @@ func init() {
 }
 
 func ProjectCreate(name string, customerName string) {
-	var customer sql.Customer
-	sql.DBc.Where("name = ?", customerName).First(&customer)
+	project.ProjectCreate(name, customerName)
+}
 
-	fmt.Println("Creating project:", name, "with default rate:", customer)
-	sql.DBc.Create(&sql.Project{Name: name, CustomerID: customer.ID})
+func ProjectDelete(name string) {
+	project.ProjectDelete(name)
 }
 
 func ProjectList() {
-	var projects []sql.Project
+	var projects []project.ProjectInt
 
 	table := tablewriter.CreateTable()
 	table.AddHeaders("Project Name", "Customer")
 
-	sql.DBc.Set("gorm:auto_preload", true).Find(&projects)
+	projects = project.ProjectList()
 
-	for _, project := range projects {
-		fmt.Println("Project: ", project)
-		table.AddRow(project.Name, project.Customer.Name)
+	for _, p := range projects {
+		table.AddRow(p.GetName(), p.GetCustomerName())
 	}
 
 	fmt.Println(table.Render())

@@ -27,7 +27,7 @@ import (
 // Customer model for keeping info about given customer
 func main() {
 
-	sql.DbInit("sqlite3", "test.db")
+	sql.DBInit("sqlite3", "test.db")
 	sql.DBPreload()
 
 	cmd.Execute()

@@ -4,32 +4,71 @@ import (
 	"fmt"
 
 	"github.com/jinzhu/gorm"
+	// Gorm Documentation
 	_ "github.com/jinzhu/gorm/dialects/sqlite"
 )
 
+// DBc connection to our local DB
 var DBc *gorm.DB
 
+// Customer definitions with it's getters
 type Customer struct {
 	gorm.Model
 	Name string `gorm:"unique;not null"`
 	Rate uint
 
-	//Projects []Project `gorm:"foreignkey:CustomerID"`
+	Projects []Project `gorm:"foreignkey:CustomerID"`
 
 	ContactName  string
 	ContactEmail string
 }
 
+// GetName getter for customer name
+func (c Customer) GetName() string {
+	return c.Name
+}
+
+// GetRate getter for customer rate
+func (c Customer) GetRate() uint {
+	return c.Rate
+}
+
+// GetContactName getter for customer contact
+func (c Customer) GetContactName() string {
+	return c.ContactName
+}
+
+// GetContactEmail getter for customer email
+func (c Customer) GetContactEmail() string {
+	return c.ContactEmail
+}
+
+// Project definitions with it's getters
 type Project struct {
 	gorm.Model
 	Name string
 
-	Customer   Customer
+	//Customer   Customer
 	CustomerID uint
 
-	Entries []Entry `gorm:"foreignkey:EntryRef"`
+	Entries []Entry `gorm:"foreignkey:ProjectID"`
 }
 
+// GetCustomerName for instance of a project
+func (p Project) GetCustomerName() string {
+	var customer Customer
+
+	DBc.Where("ID = ?", p.CustomerID).Find(&customer)
+
+	return customer.Name
+}
+
+// GetName getter for project Name
+func (p Project) GetName() string {
+	return p.Name
+}
+
+// Entry definitions with it's getters
 type Entry struct {
 	gorm.Model
 	Name     string
@@ -39,22 +78,20 @@ type Entry struct {
 	Desc     string
 	Billable bool
 
-	EntryRef uint
+	ProjectID uint
 
-	Project Project `gorm:"foreignkey:ProjRef"`
-	ProjRef uint
-
-	Tags []*Tag `gorm:"many2many:entry_tags;"`
+	//Tags []*Tag `gorm:"many2many:entry_tags;"`
 }
 
-type Tag struct {
-	gorm.Model
-	Name string `gorm:"unique"`
+//type Tag struct {
+//	gorm.Model
+//	Name string `gorm:"unique"`
+//
+//	Entries []*Entry `gorm:"many2many:entry_tags;"`
+//}
 
-	Entries []*Entry `gorm:"many2many:entry_tags;"`
-}
-
-func DbInit(DbType string, DbPath string) {
+// DBInit initialize database connection and setups GORM
+func DBInit(DbType string, DbPath string) {
 	var err error
 
 	fmt.Println("Initializing Database...")
@@ -63,29 +100,27 @@ func DbInit(DbType string, DbPath string) {
 		DBc.Close()
 		panic("DB open Failed")
 	}
-	//	defer DBc.Close()
+	//	defer db.Close()
 
-	DBc.LogMode(true)
 	// Migrate the schema
 	fmt.Println("Running database automigration...")
-	DBc.AutoMigrate(&Customer{}, &Project{}, &Entry{}, &Tag{})
+	DBc.AutoMigrate(&Customer{}, &Project{}, &Entry{})
 
+	DBc.LogMode(false)
 }
 
+// DBPreload will load db with preload data
+// TODO: Make sure we load only data which is needed when it's needed.
 func DBPreload() {
-	var customer Customer
-	//var customers []Customer
-	//var projects []Project
 
-	if err := DBc.Where("name = ?", "Cra").First(&customer).Error; err != nil {
-		fmt.Println("Preloading database data")
-		DBc.Create(&Customer{Name: "Cra", Rate: 40, ContactEmail: "pkouril@cra.cz", ContactName: "Premysl Kouril"})
-		DBc.Create(&Customer{Name: "Pixel", Rate: 30, ContactEmail: "mderer@pixelfederation.com", ContactName: "Marek Derer"})
-		DBc.Create(&Customer{Name: "IB", Rate: 40, ContactEmail: "wth@ibuildings.it", ContactName: ""})
-		DBc.Create(&Customer{Name: "Freal", Rate: 40, ContactEmail: "jbombiak@vederie.sk", ContactName: "Jozef Bombiak"})
-	} else {
-		fmt.Println("Database data loaded already")
-	}
+	fmt.Println("Preloading database data if needed...")
 
-	//
+	DBc.Where(Customer{Name: "Cra"}).FirstOrCreate(&Customer{Name: "Cra", Rate: 40,
+		ContactEmail: "pkouril@cra.cz", ContactName: "Premysl Kouril"})
+	DBc.Where(Customer{Name: "Pixel"}).FirstOrCreate(&Customer{Name: "Pixel", Rate: 37,
+		ContactEmail: "bbernat@pixelfederation.com", ContactName: "Branislav Bernat"})
+	DBc.Where(Customer{Name: "IB"}).FirstOrCreate(&Customer{Name: "IB", Rate: 40,
+		ContactEmail: "alessandra@ibuildings.it", ContactName: "Alesandra Pretromilli"})
+	DBc.Where(Customer{Name: "Freal"}).FirstOrCreate(&Customer{Name: "Freal", Rate: 40,
+		ContactEmail: "jbombiak@vederie.sk", ContactName: "Jozef Bombiak"})
 }
