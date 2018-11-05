@@ -17,9 +17,10 @@ func init() {
 	var rate uint
 
 	var custCmd = &cobra.Command{
-		Use:   "customer",
-		Short: "Manipulate worktracker customers",
-		Long:  `Create/Update/List/Delete customers`,
+		Use:     "customer",
+		Aliases: []string{"c"},
+		Short:   "Manipulate worktracker customers",
+		Long:    `Create/Update/List/Delete customers`,
 	}
 
 	var custCreateCmd = &cobra.Command{
@@ -27,7 +28,7 @@ func init() {
 		Short: "Create customer with given name",
 		Long:  `Create new customers`,
 		Run: func(cmd *cobra.Command, args []string) {
-			CustomerCreate(customerName, rate, customerContactName, customerEmail)
+			customer.CustomerCreate(customerName, rate, customerContactName, customerEmail)
 		},
 	}
 	custCreateCmd.Flags().UintVarP(&rate, "rate", "r", 0, "Default rate for a given customer")
@@ -42,7 +43,7 @@ func init() {
 		Short: "Delete customer with given name",
 		Long:  `Delete existing customers`,
 		Run: func(cmd *cobra.Command, args []string) {
-			CustomerDelete(customerName)
+			customer.CustomerDelete(customerName)
 		},
 	}
 	custDeleteCmd.Flags().StringVarP(&customerName, "name", "n", "", "customer name to work with")
@@ -63,27 +64,18 @@ func init() {
 	custCmd.AddCommand(custListCmd)
 }
 
-func CustomerCreate(name string, rate uint, contact string, email string) {
-	customer.CustomerCreate(name, rate, contact, email)
-}
-
-func CustomerDelete(name string) {
-	customer.CustomerDelete(name)
-}
-
 func CustomerList() {
 	var customers []customer.CustomerInt
 
 	table := tablewriter.CreateTable()
-	table.AddHeaders("Customer Name", "Rate", "Contact Name", "Contact Email")
+	table.AddHeaders("ID", "Customer Name", "Rate", "Contact Name", "Contact Email")
 
 	customers = customer.CustomerList()
 
 	fmt.Println("List existing customers: ")
 
-	for _, customer := range customers {
-		table.AddRow(customer.GetName(), customer.GetRate(), customer.GetContactName(), customer.GetContactEmail())
+	for _, c := range customers {
+		table.AddRow(c.GetID(), c.GetName(), c.GetRate(), c.GetContactName(), c.GetContactEmail())
 	}
 	fmt.Println(table.Render())
-
 }

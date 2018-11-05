@@ -13,10 +13,13 @@ func init() {
 	var projName string
 	var projCustName string
 
+	var projID uint
+
 	var projCmd = &cobra.Command{
-		Use:   "project",
-		Short: "Manipulate worktracker projects",
-		Long:  `Create project under which we can track work`,
+		Use:     "project",
+		Aliases: []string{"p"},
+		Short:   "Manipulate worktracker projects",
+		Long:    `Create project under which we can track work`,
 	}
 
 	var projCreateCmd = &cobra.Command{
@@ -24,7 +27,7 @@ func init() {
 		Short: "Create project with given name",
 		Long:  `Create project which belongs to one customer`,
 		Run: func(cmd *cobra.Command, args []string) {
-			ProjectCreate(projName, projCustName)
+			project.ProjectCreate(projName, projCustName)
 		},
 	}
 	projCreateCmd.Flags().StringVarP(&projName, "name", "n", "", "Project name")
@@ -37,11 +40,11 @@ func init() {
 		Short: "Delete projects",
 		Long:  `Delete created project`,
 		Run: func(cmd *cobra.Command, args []string) {
-			ProjectDelete(projName)
+			project.ProjectDelete(projID)
 		},
 	}
-	projDelCmd.Flags().StringVarP(&projName, "name", "n", "", "Project name")
-	projDelCmd.MarkFlagRequired("name")
+	projDelCmd.Flags().UintVarP(&projID, "id", "i", 0, "ID of project to delete")
+	projDelCmd.MarkFlagRequired("id")
 
 	var projListCmd = &cobra.Command{
 		Use:   "list",
@@ -54,27 +57,20 @@ func init() {
 
 	rootCmd.AddCommand(projCmd)
 	projCmd.AddCommand(projCreateCmd)
+	projCmd.AddCommand(projDelCmd)
 	projCmd.AddCommand(projListCmd)
-}
-
-func ProjectCreate(name string, customerName string) {
-	project.ProjectCreate(name, customerName)
-}
-
-func ProjectDelete(name string) {
-	project.ProjectDelete(name)
 }
 
 func ProjectList() {
 	var projects []project.ProjectInt
 
 	table := tablewriter.CreateTable()
-	table.AddHeaders("Project Name", "Customer")
+	table.AddHeaders("ID", "Project Name", "Customer")
 
 	projects = project.ProjectList()
 
 	for _, p := range projects {
-		table.AddRow(p.GetName(), p.GetCustomerName())
+		table.AddRow(p.GetID(), p.GetName(), p.GetCustomerName())
 	}
 
 	fmt.Println(table.Render())

@@ -23,6 +23,11 @@ type Customer struct {
 	ContactEmail string
 }
 
+// GetID getter for customer ID
+func (c Customer) GetID() uint {
+	return c.ID
+}
+
 // GetName getter for customer name
 func (c Customer) GetName() string {
 	return c.Name
@@ -41,6 +46,10 @@ func (c Customer) GetContactName() string {
 // GetContactEmail getter for customer email
 func (c Customer) GetContactEmail() string {
 	return c.ContactEmail
+}
+
+func GetCustomerByName(customerName string, customer *Customer) {
+	DBc.Where("name = ?", customerName).First(customer)
 }
 
 // Project definitions with it's getters
@@ -68,27 +77,32 @@ func (p Project) GetName() string {
 	return p.Name
 }
 
+// GetId getter for project ID
+func (p Project) GetID() uint {
+	return p.ID
+}
+
 // Entry definitions with it's getters
 type Entry struct {
 	gorm.Model
-	Name     string
-	Duration int64
-	Started  int64
-	Ended    int64
-	Desc     string
-	Billable bool
+	Name      string
+	Duration  int64
+	StartDate int64
+	EndDate   int64
+	Desc      string
+	Billable  bool
 
 	ProjectID uint
 
-	//Tags []*Tag `gorm:"many2many:entry_tags;"`
+	Tags []*Tag `gorm:"many2many:entry_tags;"`
 }
 
-//type Tag struct {
-//	gorm.Model
-//	Name string `gorm:"unique"`
-//
-//	Entries []*Entry `gorm:"many2many:entry_tags;"`
-//}
+type Tag struct {
+	gorm.Model
+	Name string `gorm:"unique"`
+
+	Entries []*Entry `gorm:"many2many:entry_tags;"`
+}
 
 // DBInit initialize database connection and setups GORM
 func DBInit(DbType string, DbPath string) {

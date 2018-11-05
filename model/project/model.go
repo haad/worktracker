@@ -9,21 +9,23 @@ import (
 type ProjectInt interface {
 	GetName() string
 	GetCustomerName() string
+	GetID() uint
 }
 
 func ProjectCreate(name string, customerName string) {
 	var customer sql.Customer
-	sql.DBc.Where("name = ?", customerName).First(&customer)
+	sql.GetCustomerByName(customerName, &customer)
 
 	fmt.Println("Creating project:", name, "with default rate:", customer)
-	sql.DBc.Create(&sql.Project{Name: name, CustomerID: customer.ID})
+	sql.DBc.Create(&sql.Project{Name: name, CustomerID: customer.GetID()})
 }
 
-func ProjectDelete(name string) {
+func ProjectDelete(id uint) {
 	var project sql.Project
-	sql.DBc.Where("name = ?", name).First(&project)
 
-	fmt.Println("Deleting project:", name)
+	sql.DBc.Where("ID = ?", id).First(&project)
+
+	fmt.Println("Deleting project:", project.GetName())
 	sql.DBc.Unscoped().Delete(&project)
 }
 

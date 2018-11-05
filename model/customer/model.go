@@ -8,6 +8,7 @@ import (
 )
 
 type CustomerInt interface {
+	GetID() uint
 	GetName() string
 	GetContactEmail() string
 	GetContactName() string
@@ -31,7 +32,7 @@ func CustomerDelete(name string) {
 	}
 
 	fmt.Println("Deleting customer:", name)
-	sql.DBc.Where("name = ?", name).Delete(&customer)
+	//sql.DBc.Where("name = ?", name).Delete(&customer)
 	sql.DBc.Unscoped().Delete(&customer)
 }
 

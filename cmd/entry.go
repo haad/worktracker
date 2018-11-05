@@ -2,51 +2,78 @@ package cmd
 
 import (
 	"fmt"
+	//	"time"
 
 	"github.com/spf13/cobra"
-	//"github.com/haad/worktracker/sql"
-	//"github.com/haad/worktracker/model/customer"
+	//	"github.com/xlab/tablewriter"
+	"github.com/haad/worktracker/model/entry"
 )
 
 func init() {
 	var entName string
 	var entDesc string
-	var entDura uint64
+	var entDura int64
 	var entBillable bool
 	var entTags string
-
 	var entProjectName string
+	var entCustomerName string
+
+	var entID uint
 
 	var entCmd = &cobra.Command{
-		Use:   "entry",
-		Short: "Manipulate worktracker entries",
-		Long:  `Entry is basic unit of time in worktracker `,
+		Use:     "entry",
+		Aliases: []string{"e"},
+		Short:   "Manipulate worktracker entries",
+		Long:    `Entry is basic unit of time in worktracker `,
 	}
 
-	var entCmdLog = &cobra.Command{
-		Use:   "log",
-		Short: "Create customer with given name",
-		Long:  `Log some work done for a given project`,
+	var entCreateCmd = &cobra.Command{
+		Use:     "create",
+		Aliases: []string{"log", "l"},
+		Short:   "Create customer with given name",
+		Long:    `Log some work done for a given project`,
 		Run: func(cmd *cobra.Command, at []string) {
-			EntLog(entName, entDesc, entDura, entProjectName, entBillable, entTags)
+			entry.EntCreate(entName, entDesc, entDura, entProjectName, entCustomerName, entBillable, entTags)
+		},
+	}
+
+	entCreateCmd.Flags().StringVarP(&entName, "name", "n", "", "Entry short name")
+	entCreateCmd.Flags().StringVarP(&entDesc, "desc", "D", "", "Entry description.")
+	entCreateCmd.Flags().StringVarP(&entProjectName, "project", "P", "", "Project to which entry belongs")
+	entCreateCmd.Flags().StringVarP(&entCustomerName, "customer", "c", "", "Customer to which entry belongs")
+	entCreateCmd.Flags().Int64VarP(&entDura, "duration", "u", 0, "Duration of existing entry.")
+	entCreateCmd.Flags().BoolVarP(&entBillable, "billable", "B", true, "Is entry billable.")
+	entCreateCmd.Flags().StringVarP(&entTags, "tags", "t", "", "Comma separated list of tags.")
+	entCreateCmd.MarkFlagRequired("name")
+	entCreateCmd.MarkFlagRequired("duration")
+	entCreateCmd.MarkFlagRequired("project")
+
+	var entDelCmd = &cobra.Command{
+		Use:   "delete",
+		Short: "Delete Entects",
+		Long:  `Delete created Entect`,
+		Run: func(cmd *cobra.Command, args []string) {
+			entry.EntDelete(entID)
+		},
+	}
+	entDelCmd.Flags().UintVarP(&entID, "id", "i", 0, "ID of entry to delete")
+	entDelCmd.MarkFlagRequired("id")
+
+	var entListCmd = &cobra.Command{
+		Use:   "list",
+		Short: "List Entects",
+		Long:  `List created Entects`,
+		Run: func(cmd *cobra.Command, args []string) {
+			EntList()
 		},
 	}
 
 	rootCmd.AddCommand(entCmd)
-	entCmd.AddCommand(entCmdLog)
-
-	entCmdLog.Flags().StringVarP(&entName, "name", "n", "", "Entry short name")
-	entCmdLog.Flags().StringVarP(&entDesc, "desc", "D", "", "Entry description.")
-	entCmdLog.Flags().StringVarP(&entProjectName, "project", "P", "", "Project to which entry belongs")
-	entCmdLog.Flags().Uint64VarP(&entDura, "duration", "u", 0, "Duration of existing entry.")
-	entCmdLog.Flags().BoolVarP(&entBillable, "billable", "B", true, "IS entry billable.")
-	entCmdLog.Flags().StringVarP(&entTags, "tags", "t", "", "Comma separated list of tags.")
-	entCmdLog.MarkFlagRequired("name")
-	entCmdLog.MarkFlagRequired("duration")
-	entCmdLog.MarkFlagRequired("project")
+	entCmd.AddCommand(entCreateCmd)
+	entCmd.AddCommand(entDelCmd)
+	entCmd.AddCommand(entListCmd)
 }
 
-func EntLog(name string, desc string, dura uint64, eproj string, billable bool, tags string) {
-	fmt.Println("Creating entry:", name, "with desc:", desc, "duration was:", dura,
-		"Entry belongs to :", eproj, "and is billable:", billable, "with tags: ", tags)
+func EntList() {
+	fmt.Println("Listing entries")
 }
