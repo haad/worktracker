@@ -48,8 +48,13 @@ func (c Customer) GetContactEmail() string {
 	return c.ContactEmail
 }
 
-func GetCustomerByName(customerName string, customer *Customer) {
-	DBc.Where("name = ?", customerName).First(customer)
+// GetCustomerByName return customer if exists
+func GetCustomerByName(customerName string, customer *Customer) error {
+	if DBc.Where("name = ?", customerName).First(customer).RecordNotFound() {
+		//fmt.Println("Customer: ", customerName, "doesn't exist")
+		return fmt.Errorf("customer %s doesn't exists", customerName)
+	}
+	return nil
 }
 
 // Project definitions with it's getters
@@ -67,9 +72,18 @@ type Project struct {
 func (p Project) GetCustomerName() string {
 	var customer Customer
 
-	DBc.Where("ID = ?", p.CustomerID).Find(&customer)
+	DBc.Where("id = ?", p.CustomerID).Find(&customer)
 
 	return customer.Name
+}
+
+// GetCustomerRate for instance of a project
+func (p Project) GetCustomerRate() uint {
+	var customer Customer
+
+	DBc.Where("id = ?", p.CustomerID).Find(&customer)
+
+	return customer.Rate
 }
 
 // GetName getter for project Name
@@ -77,12 +91,27 @@ func (p Project) GetName() string {
 	return p.Name
 }
 
-// GetId getter for project ID
+// GetID getter for project ID
 func (p Project) GetID() uint {
 	return p.ID
 }
 
-// Entry definitions with it's getters
+// GetProjectByName searchs for a project by it's name and customer's name to whitch it belongs
+func GetProjectByName(customerName string, projectName string, project *Project) error {
+	var customer Customer
+
+	if err := GetCustomerByName(customerName, &customer); err != nil {
+		return fmt.Errorf("customer %s doesn't exists", customerName)
+	}
+
+	if DBc.Where("name = ? AND customer_id = ?", projectName, customer.GetID()).First(project).RecordNotFound() {
+		return fmt.Errorf("project name %s for customer %s is missing ", projectName, customerName)
+	}
+
+	return nil
+}
+
+// Entry definitions with it's Byters
 type Entry struct {
 	gorm.Model
 	Name      string
@@ -95,6 +124,44 @@ type Entry struct {
 	ProjectID uint
 
 	Tags []*Tag `gorm:"many2many:entry_tags;"`
+}
+
+// GetName getter for entry Name
+func (e Entry) GetName() string {
+	return e.Name
+}
+
+// GetID getter for entry ID
+func (e Entry) GetID() uint {
+	return e.ID
+}
+
+// GetDesc getter for entry
+func (e Entry) GetDesc() string {
+	return e.Desc
+}
+
+// GetDuration getter for entry
+func (e Entry) GetDuration() int64 {
+	return e.Duration
+}
+
+// GetProjectName for instance of a project
+func (e Entry) GetProjectName() string {
+	var project Project
+
+	DBc.Where("id = ?", e.ProjectID).Find(&project)
+
+	return project.Name
+}
+
+// GetCustomerName for instance of a project
+func (e Entry) GetCustomerName() string {
+	var project Project
+
+	DBc.Where("id = ?", e.ProjectID).Find(&project)
+
+	return project.GetCustomerName()
 }
 
 type Tag struct {

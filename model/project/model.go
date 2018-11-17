@@ -7,14 +7,17 @@ import (
 )
 
 type ProjectInt interface {
+	GetID() uint
 	GetName() string
 	GetCustomerName() string
-	GetID() uint
 }
 
 func ProjectCreate(name string, customerName string) {
 	var customer sql.Customer
-	sql.GetCustomerByName(customerName, &customer)
+	if err := sql.GetCustomerByName(customerName, &customer); err != nil {
+		fmt.Println("Customer: ", customerName, "doesn't exist. Error: ", err.Error())
+		return
+	}
 
 	fmt.Println("Creating project:", name, "with default rate:", customer)
 	sql.DBc.Create(&sql.Project{Name: name, CustomerID: customer.GetID()})

@@ -5,7 +5,8 @@ import (
 	//	"time"
 
 	"github.com/spf13/cobra"
-	//	"github.com/xlab/tablewriter"
+	"github.com/xlab/tablewriter"
+
 	"github.com/haad/worktracker/model/entry"
 )
 
@@ -75,5 +76,18 @@ func init() {
 }
 
 func EntList() {
-	fmt.Println("Listing entries")
+	var entries []entry.EntryInt
+
+	table := tablewriter.CreateTable()
+	table.AddHeaders("ID", "Entry Name", "Duration", "Desc", "Project Name", "Customer Name")
+
+	entries = entry.EntList()
+
+	fmt.Println("List existing entries: ")
+
+	for _, e := range entries {
+		table.AddRow(e.GetID(), e.GetName(), e.GetDuration(), e.GetDesc(),
+			e.GetProjectName(), e.GetCustomerName())
+	}
+	fmt.Println(table.Render())
 }
