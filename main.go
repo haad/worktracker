@@ -16,9 +16,6 @@ package main
 
 import (
 	"fmt"
-	//	"fmt"
-	//	"log"
-	//	"os"
 
 	"github.com/haad/worktracker/cmd"
 	"github.com/haad/worktracker/sql"
@@ -26,7 +23,6 @@ import (
 
 // Customer model for keeping info about given customer
 func main() {
-
 	sql.DBInit("sqlite3", "test.db")
 	sql.DBPreload()
 

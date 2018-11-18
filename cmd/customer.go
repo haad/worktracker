@@ -69,10 +69,9 @@ func CustomerList() {
 
 	table := tablewriter.CreateTable()
 	table.AddHeaders("ID", "Customer Name", "Rate", "Contact Name", "Contact Email")
+	table.AddTitle("Customer List")
 
 	customers = customer.CustomerList()
-
-	fmt.Println("List existing customers: ")
 
 	for _, c := range customers {
 		table.AddRow(c.GetID(), c.GetName(), c.GetRate(), c.GetContactName(), c.GetContactEmail())

@@ -2,6 +2,8 @@ package sql
 
 import (
 	"fmt"
+	"strconv"
+	"time"
 
 	"github.com/jinzhu/gorm"
 	// Gorm Documentation
@@ -144,6 +146,16 @@ func (e Entry) GetDesc() string {
 // GetDuration getter for entry
 func (e Entry) GetDuration() int64 {
 	return e.Duration
+}
+
+// GetDuration getter for entry
+func (e Entry) GetDurationString() string {
+	d, err := time.ParseDuration(strconv.FormatInt(e.Duration, 10) + "s")
+
+	if err != nil {
+		return ""
+	}
+	return d.String()
 }
 
 // GetProjectName for instance of a project

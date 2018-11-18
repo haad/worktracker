@@ -2,7 +2,7 @@ package cmd
 
 import (
 	"fmt"
-	//	"time"
+	//"time"
 
 	"github.com/spf13/cobra"
 	"github.com/xlab/tablewriter"
@@ -13,7 +13,7 @@ import (
 func init() {
 	var entName string
 	var entDesc string
-	var entDura int64
+	var entDura string
 	var entBillable bool
 	var entTags string
 	var entProjectName string
@@ -42,7 +42,7 @@ func init() {
 	entCreateCmd.Flags().StringVarP(&entDesc, "desc", "D", "", "Entry description.")
 	entCreateCmd.Flags().StringVarP(&entProjectName, "project", "P", "", "Project to which entry belongs")
 	entCreateCmd.Flags().StringVarP(&entCustomerName, "customer", "c", "", "Customer to which entry belongs")
-	entCreateCmd.Flags().Int64VarP(&entDura, "duration", "u", 0, "Duration of existing entry.")
+	entCreateCmd.Flags().StringVarP(&entDura, "duration", "u", "", "Duration of existing entry.")
 	entCreateCmd.Flags().BoolVarP(&entBillable, "billable", "B", true, "Is entry billable.")
 	entCreateCmd.Flags().StringVarP(&entTags, "tags", "t", "", "Comma separated list of tags.")
 	entCreateCmd.MarkFlagRequired("name")
@@ -65,9 +65,11 @@ func init() {
 		Short: "List Entects",
 		Long:  `List created Entects`,
 		Run: func(cmd *cobra.Command, args []string) {
-			EntList()
+			EntList(entProjectName, entCustomerName)
 		},
 	}
+	entListCmd.Flags().StringVarP(&entProjectName, "project", "P", "", "Project to which entry belongs")
+	entListCmd.Flags().StringVarP(&entCustomerName, "customer", "c", "", "Customer to which entry belongs")
 
 	rootCmd.AddCommand(entCmd)
 	entCmd.AddCommand(entCreateCmd)
@@ -75,18 +77,17 @@ func init() {
 	entCmd.AddCommand(entListCmd)
 }
 
-func EntList() {
+func EntList(projectName string, customerName string) {
 	var entries []entry.EntryInt
 
 	table := tablewriter.CreateTable()
 	table.AddHeaders("ID", "Entry Name", "Duration", "Desc", "Project Name", "Customer Name")
+	table.AddTitle("Entries List")
 
-	entries = entry.EntList()
-
-	fmt.Println("List existing entries: ")
+	entries = entry.EntList(projectName, customerName)
 
 	for _, e := range entries {
-		table.AddRow(e.GetID(), e.GetName(), e.GetDuration(), e.GetDesc(),
+		table.AddRow(e.GetID(), e.GetName(), e.GetDurationString(), e.GetDesc(),
 			e.GetProjectName(), e.GetCustomerName())
 	}
 	fmt.Println(table.Render())

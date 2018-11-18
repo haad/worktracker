@@ -32,11 +32,21 @@ func ProjectDelete(id uint) {
 	sql.DBc.Unscoped().Delete(&project)
 }
 
-func ProjectList() []ProjectInt {
+func ProjectList(customerName string) []ProjectInt {
 	var projects []sql.Project
 	var pint []ProjectInt
+	var customer sql.Customer
 
-	sql.DBc.Set("gorm:auto_preload", true).Find(&projects)
+	if customerName != "" {
+		if err := sql.GetCustomerByName(customerName, &customer); err != nil {
+			fmt.Println("Customer: ", customerName, "doesn't exist. Error: ", err.Error())
+			panic("")
+		}
+
+		sql.DBc.Set("gorm:auto_preload", true).Where("customer_id = ?", customer.GetID()).Find(&projects)
+	} else {
+		sql.DBc.Set("gorm:auto_preload", true).Find(&projects)
+	}
 
 	for _, p := range projects {
 		pint = append(pint, p)

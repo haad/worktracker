@@ -3,6 +3,8 @@ package entry
 import (
 	"fmt"
 	"github.com/haad/worktracker/sql"
+	"time"
+	//"github.com/haad/worktracker/time"
 )
 
 type EntryInt interface {
@@ -10,21 +12,28 @@ type EntryInt interface {
 	GetName() string
 	GetDesc() string
 	GetDuration() int64
+	GetDurationString() string
 	GetCustomerName() string
 	GetProjectName() string
 }
 
-func EntCreate(name string, desc string, dura int64, projectName string, customerName string, billable bool, tags string) {
+func EntCreate(name string, desc string, dura string, projectName string, customerName string,
+	billable bool, tags string) {
 	var project sql.Project
+	var err error
 
-	fmt.Println("P:", projectName, "C:", customerName)
+	d, err := time.ParseDuration(dura)
+	if err != nil {
+		panic(err)
+	}
+
 	if err := sql.GetProjectByName(customerName, projectName, &project); err != nil {
 		fmt.Println("Project: ", projectName, "with customer: ", customerName, "not found. Error:", err.Error())
 		return
 	}
 
 	fmt.Println("Creating entry for a project: ", project, "on customer: ", project.GetCustomerName())
-	sql.DBc.Create(&sql.Entry{Name: name, Desc: desc, Duration: dura, Billable: billable, ProjectID: project.ID})
+	sql.DBc.Create(&sql.Entry{Name: name, Desc: desc, Duration: int64(d.Seconds()), Billable: billable, ProjectID: project.ID})
 }
 
 func EntDelete(id uint) {
@@ -36,14 +45,24 @@ func EntDelete(id uint) {
 	sql.DBc.Unscoped().Delete(&entry)
 }
 
-func EntList() []EntryInt {
+func EntList(projectName string, customerName string) []EntryInt {
 	var entries []sql.Entry
 	var eint []EntryInt
 
-	sql.DBc.Set("gorm:auto_preload", true).Find(&entries)
+	var project sql.Project
+
+	if projectName != "" && customerName != "" {
+		if err := sql.GetProjectByName(customerName, projectName, &project); err != nil {
+			fmt.Println("Project: ", projectName, "with customer: ", customerName, "not found. Error:", err.Error())
+			panic("")
+		}
+
+		sql.DBc.Set("gorm:auto_preload", true).Where("project_id = ?", project.GetID()).Find(&entries)
+	} else {
+		sql.DBc.Set("gorm:auto_preload", true).Find(&entries)
+	}
 
 	for _, e := range entries {
-		fmt.Println("Project ID: ", e.ProjectID)
 		eint = append(eint, e)
 	}
 

@@ -51,9 +51,10 @@ func init() {
 		Short: "List projects",
 		Long:  `List created projects`,
 		Run: func(cmd *cobra.Command, args []string) {
-			ProjectList()
+			ProjectList(projCustName)
 		},
 	}
+	projListCmd.Flags().StringVarP(&projCustName, "customer", "c", "", "Project customer name.")
 
 	rootCmd.AddCommand(projCmd)
 	projCmd.AddCommand(projCreateCmd)
@@ -61,13 +62,14 @@ func init() {
 	projCmd.AddCommand(projListCmd)
 }
 
-func ProjectList() {
+func ProjectList(customerName string) {
 	var projects []project.ProjectInt
 
 	table := tablewriter.CreateTable()
 	table.AddHeaders("ID", "Project Name", "Customer")
+	table.AddTitle("Projects List")
 
-	projects = project.ProjectList()
+	projects = project.ProjectList(customerName)
 
 	for _, p := range projects {
 		table.AddRow(p.GetID(), p.GetName(), p.GetCustomerName())
