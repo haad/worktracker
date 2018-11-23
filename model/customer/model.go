@@ -3,7 +3,7 @@ package customer
 import (
 	"fmt"
 
-	//"github.com/haad/worktracker/model/project"
+	"github.com/haad/worktracker/model/project"
 	"github.com/haad/worktracker/sql"
 )
 
@@ -26,13 +26,12 @@ func CustomerDelete(name string) {
 	sql.DBc.Set("gorm:auto_preload", true).Where("name = ?", name).First(&customer)
 
 	fmt.Println("Deleting projects:")
-	for _, project := range customer.Projects {
-		// XXX: Call project related routine here
-		sql.DBc.Unscoped().Delete(&project)
+	for _, p := range customer.Projects {
+		project.ProjectDelete(p.GetID())
+		//		sql.DBc.Unscoped().Delete(&project)
 	}
 
 	fmt.Println("Deleting customer:", name)
-	//sql.DBc.Where("name = ?", name).Delete(&customer)
 	sql.DBc.Unscoped().Delete(&customer)
 }
 

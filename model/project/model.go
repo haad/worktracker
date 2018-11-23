@@ -26,7 +26,12 @@ func ProjectCreate(name string, customerName string) {
 func ProjectDelete(id uint) {
 	var project sql.Project
 
-	sql.DBc.Where("ID = ?", id).First(&project)
+	sql.DBc.Set("gorm:auto_preload", true).Where("ID = ?", id).First(&project)
+
+	for _, entry := range project.Entries {
+		fmt.Println("Deleting entry:", entry.GetName())
+		sql.DBc.Unscoped().Delete(&entry)
+	}
 
 	fmt.Println("Deleting project:", project.GetName())
 	sql.DBc.Unscoped().Delete(&project)
