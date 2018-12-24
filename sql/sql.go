@@ -143,6 +143,11 @@ func (e Entry) GetDesc() string {
 	return e.Desc
 }
 
+// GetSDate getter for entry
+func (e Entry) GetSDate() int64 {
+	return e.StartDate
+}
+
 // GetDuration getter for entry
 func (e Entry) GetDuration() int64 {
 	return e.Duration

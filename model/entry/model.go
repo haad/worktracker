@@ -12,15 +12,25 @@ type EntryInt interface {
 	GetName() string
 	GetDesc() string
 	GetDuration() int64
+	GetSDate() int64
 	GetDurationString() string
 	GetCustomerName() string
 	GetProjectName() string
 }
 
-func EntCreate(name string, desc string, dura string, projectName string, customerName string,
+const shortForm = "2006-Jan-02"
+
+func EntCreate(name string, desc string, dura string, startDate string, projectName string, customerName string,
 	billable bool, tags string) {
 	var project sql.Project
 	var err error
+	var startD time.Time
+
+	if startDate == "" {
+		startD = time.Now()
+	} else {
+		startD, _ = time.Parse(shortForm, startDate)
+	}
 
 	d, err := time.ParseDuration(dura)
 	if err != nil {
@@ -33,7 +43,7 @@ func EntCreate(name string, desc string, dura string, projectName string, custom
 	}
 
 	fmt.Println("Creating entry for a project: ", project, "on customer: ", project.GetCustomerName())
-	sql.DBc.Create(&sql.Entry{Name: name, Desc: desc, Duration: int64(d.Seconds()), Billable: billable, ProjectID: project.ID})
+	sql.DBc.Create(&sql.Entry{Name: name, Desc: desc, StartDate: startD.Unix(), Duration: int64(d.Seconds()), Billable: billable, ProjectID: project.ID})
 }
 
 func EntDelete(id uint) {
