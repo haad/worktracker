@@ -1,6 +1,7 @@
 package sql
 
 import (
+	"encoding/json"
 	"fmt"
 	"strconv"
 	"time"
@@ -12,6 +13,8 @@ import (
 
 // DBc connection to our local DB
 var DBc *gorm.DB
+
+const ShortForm = "02/01/2006"
 
 // Customer definitions with it's getters
 type Customer struct {
@@ -64,8 +67,7 @@ type Project struct {
 	gorm.Model
 	Name string
 
-	//Customer   Customer
-	CustomerID uint
+	CustomerID uint `json:"-"`
 
 	Entries []Entry `gorm:"foreignkey:ProjectID"`
 }
@@ -125,7 +127,7 @@ type Entry struct {
 
 	ProjectID uint
 
-	Tags []*Tag `gorm:"many2many:entry_tags;"`
+	Tags []*Tag `gorm:"many2many:entry_tags;" json:"-"`
 }
 
 // GetName getter for entry Name
@@ -148,12 +150,18 @@ func (e Entry) GetSDate() int64 {
 	return e.StartDate
 }
 
+func (e Entry) GetSDateString() string {
+	tm := time.Unix(e.StartDate, 0)
+
+	return tm.Format(ShortForm)
+}
+
 // GetDuration getter for entry
 func (e Entry) GetDuration() int64 {
 	return e.Duration
 }
 
-// GetDuration getter for entry
+// GetDurationString gets duretion converted to string for entry
 func (e Entry) GetDurationString() string {
 	d, err := time.ParseDuration(strconv.FormatInt(e.Duration, 10) + "s")
 
@@ -181,9 +189,27 @@ func (e Entry) GetCustomerName() string {
 	return project.GetCustomerName()
 }
 
+func (e Entry) MarshalJSON() ([]byte, error) {
+	basicEntry := struct {
+		Name      string `json:"name"`
+		Duration  string `json:"duration"`
+		StartDate string `json:"start_date"`
+		Desc      string `json:"desc"`
+		Billable  bool   `json:"billable"`
+	}{
+		Name:      e.Name,
+		Duration:  e.GetDurationString(),
+		StartDate: e.GetSDateString(),
+		Desc:      e.Desc,
+		Billable:  e.Billable,
+	}
+
+	return json.Marshal(basicEntry)
+}
+
 type Tag struct {
-	gorm.Model
-	Name string `gorm:"unique"`
+	gorm.Model `json:"-"`
+	Name       string `gorm:"unique"`
 
 	Entries []*Entry `gorm:"many2many:entry_tags;"`
 }

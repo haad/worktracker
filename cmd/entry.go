@@ -44,7 +44,7 @@ func init() {
 	entCreateCmd.Flags().StringVarP(&entProjectName, "project", "P", "", "Project to which entry belongs")
 	entCreateCmd.Flags().StringVarP(&entCustomerName, "customer", "c", "", "Customer to which entry belongs")
 	entCreateCmd.Flags().StringVarP(&entDura, "duration", "u", "", "Duration of existing entry.")
-	entCreateCmd.Flags().StringVarP(&entStart, "start", "s", "", "Start date of work in format YYYY-MM-DD")
+	entCreateCmd.Flags().StringVarP(&entStart, "start", "s", "", "Start date of work in format DD/MM/YYYY")
 	entCreateCmd.Flags().BoolVarP(&entBillable, "billable", "B", true, "Is entry billable.")
 	entCreateCmd.Flags().StringVarP(&entTags, "tags", "t", "", "Comma separated list of tags.")
 	entCreateCmd.MarkFlagRequired("name")
@@ -89,7 +89,7 @@ func EntList(projectName string, customerName string) {
 	entries = entry.EntList(projectName, customerName)
 
 	for _, e := range entries {
-		table.AddRow(e.GetID(), e.GetName(), e.GetSDate(), e.GetDurationString(), e.GetDesc(),
+		table.AddRow(e.GetID(), e.GetName(), e.GetSDateString(), e.GetDurationString(), e.GetDesc(),
 			e.GetProjectName(), e.GetCustomerName())
 	}
 	fmt.Println(table.Render())
