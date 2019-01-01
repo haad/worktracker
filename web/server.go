@@ -24,7 +24,7 @@ var (
 
 func init() {
 	router = mux.NewRouter()
-	router.HandleFunc("/customers", CustomerIndex)
+	router.HandleFunc("/rest/customers.json", CustomerIndex)
 
 	//	router.HandleFunc("/projects", index)
 	//	router.HandleFunc("/entries/{id}", update)
@@ -32,7 +32,7 @@ func init() {
 }
 
 func StartServer(addr string) error {
-	url := "http://" + addr + "/a/index.html"
+	url := "http://" + addr + "/rest/customers.json"
 
 	wtPkg, err := build.Import("github.com/haad/worktracker", "", build.FindOnly)
 	if err != nil {
