@@ -41,11 +41,6 @@ func StartServer(addr string) {
 	e.Logger.Fatal(e.Start(addr))
 }
 
-func AppIndex(c echo.Context) error {
-
-	return c.String(http.StatusOK, "")
-}
-
 func CustomerIndex(c echo.Context) error {
 	var customers []customer.CustomerInt
 
