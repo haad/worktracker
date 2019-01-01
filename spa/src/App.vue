@@ -1,24 +1,18 @@
 <template>
   <div id="app">
+    <b-navbar toggleable="md" type="dark" variant="dark">
+      <b-navbar-toggle target="nav_collapse"></b-navbar-toggle>
+      <b-navbar-brand href="/app">WorkTracker</b-navbar-brand>
 
-    <!-- Fixed navbar -->
-    <nav class="navbar navbar-expand-md navbar-dark fixed-top bg-dark">
-      <a class="navbar-brand" href="#">Fixed navbar</a>
-      <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarCollapse" aria-controls="navbarCollapse" aria-expanded="false" aria-label="Toggle navigation">
-        <span class="navbar-toggler-icon"></span>
-      </button>
-      <div class="collapse navbar-collapse" id="navbarCollapse">
-        <ul class="nav navbar-nav">
-          <router-link tag="li" active-class="active" to="/" exact><a>Home</a></router-link>
-          <router-link tag="li" active-class="active" to="/about"><a>About</a></router-link>
-          <router-link tag="li" active-class="active" to="/rest"><a>Rest</a></router-link>
-        </ul>
-      </div>
-    </nav>
+      <b-collapse is-nav id="nav_collapse">
+        <b-navbar-nav>
+          <b-nav-item href="/app/customers">Customers</b-nav-item>
+          <b-nav-item href="/app/projects">Projects</b-nav-item>
+          <b-nav-item href="/app/about">About</b-nav-item>
+        </b-navbar-nav>
+      </b-collapse>
+    </b-navbar>
 
-    <router-link :to="{ name: 'Hello' }">Home</router-link>
-    <router-link to="/about">About</router-link>
-    <router-link to="/rest">Rest</router-link>
     <router-view/>
   </div>
 </template>
@@ -35,7 +29,7 @@ export default {
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   color: #2c3e50;
-  margin-top: 60px;
+  margin-top: 40px;
   margin-left: 100px;
 }
 
@@ -45,7 +39,7 @@ body {
 
 main {
   text-align: center;
-  margin-top: 40px;
+  margin-top: 60px;
 }
 
 header {

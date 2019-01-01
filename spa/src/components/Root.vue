@@ -1,7 +1,7 @@
 <template>
   <div class="hello">
     <h1>{{ msg }}</h1>
-    {{ info }}
+    {{ server_data }}
   </div>
 </template>
 
@@ -11,7 +11,6 @@ export default {
   data () {
     return {
       msg: 'Welcome Worktracker Page',
-      //info: 'BLABLABLA'
     }
   }
 }

@@ -1,27 +1,34 @@
 import Vue from 'vue'
 import Router from 'vue-router'
-import HelloWorld from '@/components/HelloWorld'
+
+import Root from '@/components/Root'
 import About from '@/components/About'
-import Rest from '@/components/Rest'
+import Customers from '@/components/Customers'
+import Projects from '@/components/Projects'
 
 Vue.use(Router)
 
 export default new Router({
   routes: [
     {
-      path: '/',
-      name: 'Hello',
-      component: HelloWorld
+      path: '/app',
+      name: 'Root',
+      component: Root
     },
     {
-      path: '/about',
+      path: '/app/about',
       name: 'About',
       component: About
     },
     {
-      path: '/rest',
-      name: 'Rest',
-      component: Rest
+      path: '/app/customers',
+      name: 'Customers',
+      component: Customers
+    },
+    {
+      path: '/app/projects',
+      name: 'Projects',
+      component: Projects
     }
   ],
   mode: 'history'

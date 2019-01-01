@@ -243,6 +243,8 @@ func DBPreload() {
 		ContactEmail: "pkouril@cra.cz", ContactName: "Premysl Kouril"})
 	DBc.Where(Customer{Name: "Pixel"}).FirstOrCreate(&Customer{Name: "Pixel", Rate: 37,
 		ContactEmail: "bbernat@pixelfederation.com", ContactName: "Branislav Bernat"})
+	DBc.Where(Customer{Name: "Pygmalios"}).FirstOrCreate(&Customer{Name: "Pygmalios", Rate: 50,
+		ContactEmail: "m.holler@pygmalios.com", ContactName: "Marian Holler"})
 	DBc.Where(Customer{Name: "IB"}).FirstOrCreate(&Customer{Name: "IB", Rate: 40,
 		ContactEmail: "alessandra@ibuildings.it", ContactName: "Alesandra Pretromilli"})
 	DBc.Where(Customer{Name: "Freal"}).FirstOrCreate(&Customer{Name: "Freal", Rate: 40,

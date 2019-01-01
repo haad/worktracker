@@ -1,70 +1,63 @@
 package web
 
 import (
-	"fmt"
-	"log"
-
 	"encoding/json"
-	"go/build"
-	//	"io/ioutil"
+	"fmt"
 
 	"net/http"
-	//"net/http/httputil"
 
 	"os/exec"
 
-	"github.com/gorilla/mux"
+	"github.com/labstack/echo"
+	"github.com/labstack/echo/middleware"
 
 	"github.com/haad/worktracker/model/customer"
 )
 
-var (
-	router *mux.Router
-)
+func StartServer(addr string) {
+	url := "http://" + addr + "/index.html"
 
-func init() {
-	router = mux.NewRouter()
-	router.HandleFunc("/rest/customers.json", CustomerIndex)
+	e := echo.New()
 
-	//	router.HandleFunc("/projects", index)
-	//	router.HandleFunc("/entries/{id}", update)
-	router.Handle("/", router.NotFoundHandler)
-}
+	e.Pre(middleware.Rewrite(map[string]string{
+		"/app/*": "/index.html",
+	}))
 
-func StartServer(addr string) error {
-	url := "http://" + addr + "/rest/customers.json"
+	e.Static("/static", "spa/dist/static")
+	e.Static("/", "spa/dist")
 
-	wtPkg, err := build.Import("github.com/haad/worktracker", "", build.FindOnly)
-	if err != nil {
-		log.Fatalln(err)
-	}
+	// Middleware
+	e.Use(middleware.Logger())
+	e.Use(middleware.Recover())
 
-	http.Handle("/", router)
-	http.Handle("/a/",
-		http.StripPrefix(
-			"/a/", http.FileServer(http.Dir(wtPkg.Dir+"/public")),
-		),
-	)
+	// Routes
+	e.GET("/rest", CustomerIndex)
+	//e.GET("/app/*", AppIndex)
 
+	// Start server
+	fmt.Printf("starting %s\n", url)
 	exec.Command("open", url).Run()
 
-	fmt.Printf("starting %s\n", url)
-
-	return http.ListenAndServe(addr, nil)
+	e.Logger.Fatal(e.Start(addr))
 }
 
-func CustomerIndex(w http.ResponseWriter, req *http.Request) {
+func AppIndex(c echo.Context) error {
+
+	return c.String(http.StatusOK, "")
+}
+
+func CustomerIndex(c echo.Context) error {
 	var customers []customer.CustomerInt
 
-	w.Header().Set("Content-Type", "application/json")
+	c.Response().Header().Set("Content-Type", "application/json")
+	c.Response().Header().Set("Access-Control-Allow-Origin", "*")
 
 	customers = customer.CustomerList()
 
 	b, err := json.Marshal(customers)
 	if err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
-		return
+		return c.String(http.StatusInternalServerError, err.Error())
 	}
 
-	fmt.Fprint(w, string(b))
+	return c.String(http.StatusOK, string(b))
 }
