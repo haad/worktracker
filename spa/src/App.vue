@@ -33,6 +33,10 @@ export default {
   margin-left: 100px;
 }
 
+.project {
+  margin-top: 40px;
+}
+
 body {
   margin: 0;
 }

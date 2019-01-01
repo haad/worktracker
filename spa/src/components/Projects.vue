@@ -1,6 +1,6 @@
 <template>
-  <div class="rest">
-    <div class="wrapper" v-for="cust in server_data">
+  <div class="projects">
+    <div class="project" v-for="cust in server_data">
       <h3> Projects for customer: {{ cust.Name }} </h3>
       <b-table striped hover :items=cust.Projects :fields=fields :bordered=true :sort-by.sync="Rate"></b-table>
     </div>
