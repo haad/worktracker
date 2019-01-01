@@ -15,12 +15,12 @@ new Vue({
     template: '<App/>',
     data () {
       return {
-        info: null
+        customers: []
       }
     },
     mounted () {
       axios
-        .get('http://localhost:8080/rest/customers.json')
-        .then(response => (this.info = response))
+      .get('http://localhost:8080/rest/customers.json')
+      .then(response => (this.customers = response.data))
     }
 })

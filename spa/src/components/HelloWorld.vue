@@ -1,6 +1,7 @@
 <template>
   <div class="hello">
     <h1>{{ msg }}</h1>
+    {{ info }}
   </div>
 </template>
 
@@ -9,7 +10,8 @@ export default {
   name: 'HelloWorld',
   data () {
     return {
-      msg: 'Welcome Worktracker Page'
+      msg: 'Welcome Worktracker Page',
+      //info: 'BLABLABLA'
     }
   }
 }
