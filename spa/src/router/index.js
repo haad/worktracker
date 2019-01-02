@@ -29,6 +29,12 @@ export default new Router({
       path: '/app/projects',
       name: 'Projects',
       component: Projects
+    },
+    {
+      path: '/app/project/:id',
+      name: 'Project',
+      component: Projects,
+      props: true
     }
   ],
   mode: 'history'

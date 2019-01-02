@@ -1,8 +1,16 @@
 <template>
-  <div class="projects">
+  <div class="projects" v-if="$route.params.id">
+    <div class="project" v-for="cust in server_data">
+      <h3 v-if="cust.ID == $route.params.id"> Projects for customer: {{ cust.Name }} </h3>
+      <b-table striped hover :items=cust.Projects :fields=fields :bordered=true
+               v-if="cust.ID == $route.params.id"></b-table>
+    </div>
+  </div>
+
+  <div class="projects" v-else>
     <div class="project" v-for="cust in server_data">
       <h3> Projects for customer: {{ cust.Name }} </h3>
-      <b-table striped hover :items=cust.Projects :fields=fields :bordered=true :sort-by.sync="Rate"></b-table>
+      <b-table striped hover :items=cust.Projects :fields=fields :bordered=true></b-table>
     </div>
   </div>
 </template>
@@ -11,6 +19,7 @@
 import axios from 'axios';
 
 export default {
+  name: 'Projects',
   data() {
     return {
       server_data: [],

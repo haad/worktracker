@@ -2,7 +2,11 @@
   <div class="customers">
     <h3>List of defined customers</h3>
 
-    <b-table striped hover :items=server_data :fields=fields :bordered=true :sort-by.sync="Rate"></b-table>
+    <b-table striped hover :items=server_data :fields=fields :bordered=true>
+      <template slot="Projects" slot-scope="server_data">
+        <router-link :to="{ name: 'Project', params: { id: server_data.item.ID }}">Projects</router-link>
+      </template>
+    </b-table>
   </div>
 </template>
 
@@ -18,7 +22,8 @@ export default {
                 {key: 'Name', sortable: false},
                 {key: 'Rate', sortable: true},
                 {key: 'ContactName', sortable: false},
-                {key: 'ContactEmail', sortable: false}
+                {key: 'ContactEmail', sortable: false},
+                {key: 'Projects', label: 'Projects' }
               ]
     }
   },
