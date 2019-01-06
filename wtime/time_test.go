@@ -7,7 +7,8 @@ import (
 )
 
 func TestCompareStartDate(t *testing.T) {
-	const shortForm = "02/01/2006"
+	shortForm := "02/01/2006"
+	dateForm := "01/2006"
 
 	testEntryDates := [...]string{"02/11/2018", "05/10/2017", "24/09/2018", "12/01/2019", "29/12/2017", "29/12/2017"}
 	testDateSpecs := [...]string{"<12/2018", ">10/2017", "=09/2018", "=02/2019", "<01/2018", "<01/2017"}
@@ -21,6 +22,17 @@ func TestCompareStartDate(t *testing.T) {
 			t.Errorf("GetStartEndMonth failed, expected %t got: %t", testResults[i], CompareStartDate(testDateSpecs[i], sd.Unix()))
 		}
 	}
+
+	t.Logf("Testing @")
+	if CompareStartDate("@", time.Now().Unix()) != true {
+		t.Errorf("GetStartEndMonth failed, expected %t got: %t", true,
+			CompareStartDate(time.Now().Format(dateForm), time.Now().Unix()))
+	}
+	if CompareStartDate("@", time.Date(time.Now().Year()-2, 1, 0, 0, 0, 0, 0, time.UTC).Unix()) != false {
+		t.Errorf("GetStartEndMonth failed, expected %t got: %t", false,
+			CompareStartDate(time.Now().Format(dateForm), time.Now().Unix()))
+	}
+
 }
 func TestGetStartEndMonth(t *testing.T) {
 	const shortForm = "01/2006"

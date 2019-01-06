@@ -31,10 +31,16 @@ func GetStartEndMonth(startD time.Time) (int64, int64) {
 
 // XXX Error Handling
 func CompareStartDate(startDate string, entryDate int64) bool {
+	var sd time.Time
+	var err error
 
-	sd, err := time.Parse(DateForm, strings.TrimLeft(startDate, "<>@="))
-	if err != nil {
-		panic(err)
+	if strings.TrimLeft(startDate, "<>@=") == "" {
+		sd = time.Now()
+	} else {
+		sd, err = time.Parse(DateForm, strings.TrimLeft(startDate, "<>@="))
+		if err != nil {
+			panic(err)
+		}
 	}
 
 	switch string(startDate[0]) {
@@ -53,7 +59,7 @@ func CompareStartDate(startDate string, entryDate int64) bool {
 		}
 	case "@":
 		// @ means to print only entries related to current month
-		start, end := GetStartEndMonth(time.Now())
+		start, end := GetStartEndMonth(sd)
 		if entryDate >= start && entryDate < end {
 			return true
 		}
