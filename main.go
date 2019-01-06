@@ -16,14 +16,47 @@ package main
 
 import (
 	"fmt"
+	"os"
+
+	homedir "github.com/mitchellh/go-homedir"
+	"github.com/spf13/viper"
 
 	"github.com/haad/worktracker/cmd"
 	"github.com/haad/worktracker/sql"
 )
 
+// initConfig reads in config file
+func initConfig() {
+
+	// Find home directory.
+	home, err := homedir.Dir()
+	if err != nil {
+		fmt.Println(err)
+		os.Exit(1)
+	}
+
+	viper.SetConfigType("yaml")
+	viper.AddConfigPath(home + "/.worktracker")
+	viper.SetConfigFile("worktracker")
+
+	// If a config file is found, read it in.
+	if err := viper.ReadInConfig(); err != nil {
+		fmt.Println("Using config file:", viper.ConfigFileUsed(), "Error: ", err.Error())
+	}
+}
+
 // Customer model for keeping info about given customer
 func main() {
-	sql.DBInit("sqlite3", "test.db")
+
+	//initConfig()
+	// Find home directory.
+	home, err := homedir.Dir()
+	if err != nil {
+		fmt.Println(err)
+		os.Exit(1)
+	}
+
+	sql.DBInit("sqlite3", home+"/.worktracker/"+"worktracker.db")
 	sql.DBPreload()
 
 	cmd.Execute()
