@@ -3,8 +3,8 @@ package entry
 import (
 	"fmt"
 	"github.com/haad/worktracker/sql"
+	"github.com/haad/worktracker/wtime"
 	"time"
-	//"github.com/haad/worktracker/time"
 )
 
 type EntryInt interface {
@@ -30,8 +30,6 @@ func EntCreate(name string, desc string, dura string, startDate string, projectN
 
 	startD, err := time.Parse(sql.ShortForm, startDate)
 	if err != nil {
-		fmt.Println(startD)
-		fmt.Println(time.RFC3339)
 		panic(err)
 	}
 
@@ -58,7 +56,7 @@ func EntDelete(id uint) {
 	sql.DBc.Unscoped().Delete(&entry)
 }
 
-func EntList(projectName string, customerName string) []EntryInt {
+func EntList(projectName string, customerName string, startDate string) []EntryInt {
 	var entries []sql.Entry
 	var eint []EntryInt
 
@@ -67,6 +65,7 @@ func EntList(projectName string, customerName string) []EntryInt {
 	if projectName != "" && customerName != "" {
 		if err := sql.GetProjectByName(customerName, projectName, &project); err != nil {
 			fmt.Println("Project: ", projectName, "with customer: ", customerName, "not found. Error:", err.Error())
+			// XXX: fix error handling
 			panic("")
 		}
 
@@ -76,7 +75,16 @@ func EntList(projectName string, customerName string) []EntryInt {
 	}
 
 	for _, e := range entries {
-		eint = append(eint, e)
+		// if startDate fileter string was provided use it, to fileter entries visible to user
+		if startDate != "" {
+			if wtime.CompareStartDate(startDate, e.GetSDate()) {
+				eint = append(eint, e)
+			} else {
+				continue
+			}
+		} else {
+			eint = append(eint, e)
+		}
 	}
 
 	return eint

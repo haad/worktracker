@@ -67,11 +67,16 @@ func init() {
 		Short: "List Entects",
 		Long:  `List created Entects`,
 		Run: func(cmd *cobra.Command, args []string) {
-			EntList(entProjectName, entCustomerName)
+			EntList(entProjectName, entCustomerName, entStart)
 		},
 	}
 	entListCmd.Flags().StringVarP(&entProjectName, "project", "P", "", "Project to which entry belongs")
 	entListCmd.Flags().StringVarP(&entCustomerName, "customer", "c", "", "Customer to which entry belongs")
+	entListCmd.Flags().StringVarP(&entStart, "date", "d", "", `Date string in following format @<>= MM/YYYY,
+    to select entries with start date before use --date <10/2018,
+    to select entries with start date after use --date >10/2018,
+    to select entries done in a given month use --date =10/2018,
+    for selecting current month there is a shortcut by using --date @.`)
 
 	rootCmd.AddCommand(entCmd)
 	entCmd.AddCommand(entCreateCmd)
@@ -79,14 +84,14 @@ func init() {
 	entCmd.AddCommand(entListCmd)
 }
 
-func EntList(projectName string, customerName string) {
+func EntList(projectName string, customerName string, startDate string) {
 	var entries []entry.EntryInt
 
 	table := tablewriter.CreateTable()
 	table.AddHeaders("ID", "Entry Name", "Start Date", "Duration", "Desc", "Project Name", "Customer Name")
 	table.AddTitle("Entries List")
 
-	entries = entry.EntList(projectName, customerName)
+	entries = entry.EntList(projectName, customerName, startDate)
 
 	for _, e := range entries {
 		table.AddRow(e.GetID(), e.GetName(), e.GetSDateString(), e.GetDurationString(), e.GetDesc(),
