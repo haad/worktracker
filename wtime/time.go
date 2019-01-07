@@ -9,6 +9,16 @@ import (
 
 const DateForm = "01/2006"
 
+// GetDurantionString returns duration converted to a string with s/m/h
+func GetDurantionString(duration int64) string {
+	d, err := time.ParseDuration(strconv.FormatInt(duration, 10) + "s")
+
+	if err != nil {
+		return ""
+	}
+	return d.String()
+}
+
 // GetStartEndMonth gets first second of a month described in startD and first second of next month.
 // XXX Error Handling
 func GetStartEndMonth(startD time.Time) (int64, int64) {

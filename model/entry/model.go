@@ -2,9 +2,10 @@ package entry
 
 import (
 	"fmt"
+	"time"
+
 	"github.com/haad/worktracker/sql"
 	"github.com/haad/worktracker/wtime"
-	"time"
 )
 
 type EntryInt interface {

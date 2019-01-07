@@ -3,12 +3,13 @@ package sql
 import (
 	"encoding/json"
 	"fmt"
-	"strconv"
 	"time"
 
 	"github.com/jinzhu/gorm"
 	// Gorm Documentation
 	_ "github.com/jinzhu/gorm/dialects/sqlite"
+
+	"github.com/haad/worktracker/wtime"
 )
 
 // DBc connection to our local DB
@@ -65,7 +66,8 @@ func GetCustomerByName(customerName string, customer *Customer) error {
 // Project definitions with it's getters
 type Project struct {
 	gorm.Model
-	Name string
+	Name     string
+	Estimate int64
 
 	CustomerID uint `json:"-"`
 
@@ -93,6 +95,26 @@ func (p Project) GetCustomerRate() uint {
 // GetName getter for project Name
 func (p Project) GetName() string {
 	return p.Name
+}
+
+// GetEstimate getter for project Planned hours
+func (p Project) GetEstimate() int64 {
+	return p.Estimate
+}
+
+// GetDurationString gets duretion converted to string for entry
+func (p Project) GetEstimateString() string {
+	return wtime.GetDurantionString(p.Estimate)
+}
+
+func (p Project) GetWorkLoggedString() string {
+	var workedTime int64 = 0
+
+	for _, entry := range p.Entries {
+		workedTime += entry.GetDuration()
+	}
+
+	return wtime.GetDurantionString(workedTime)
 }
 
 // GetID getter for project ID
@@ -163,12 +185,7 @@ func (e Entry) GetDuration() int64 {
 
 // GetDurationString gets duretion converted to string for entry
 func (e Entry) GetDurationString() string {
-	d, err := time.ParseDuration(strconv.FormatInt(e.Duration, 10) + "s")
-
-	if err != nil {
-		return ""
-	}
-	return d.String()
+	return wtime.GetDurantionString(e.Duration)
 }
 
 // GetProjectName for instance of a project

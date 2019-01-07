@@ -15,9 +15,30 @@ type CustomerInt interface {
 	GetRate() uint
 }
 
-func CustomerCreate(name string, rate uint, contact string, email string) {
+func CustomerCreate(name string, rate int, contact string, email string) {
 	fmt.Println("Creating customer:", name, "with default rate:", rate)
-	sql.DBc.Create(&sql.Customer{Name: name, Rate: rate, ContactEmail: email, ContactName: contact})
+	sql.DBc.Create(&sql.Customer{Name: name, Rate: uint(rate), ContactEmail: email, ContactName: contact})
+}
+
+func CustomerEdit(name string, rate int, contact string, email string) {
+	var customer sql.Customer
+
+	fmt.Println("Editing customer:", name, "with default rate:", rate)
+	sql.DBc.Set("gorm:auto_preload", true).Where("name = ?", name).First(&customer)
+
+	if rate >= 0 && uint(rate) != customer.GetRate() {
+		customer.Rate = uint(rate)
+	}
+
+	if email != "" && email != customer.GetContactEmail() {
+		customer.ContactEmail = email
+	}
+
+	if contact != "" && contact != customer.GetContactName() {
+		customer.ContactName = contact
+	}
+
+	sql.DBc.Save(&customer)
 }
 
 func CustomerDelete(name string) {

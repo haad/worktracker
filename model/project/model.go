@@ -2,25 +2,62 @@ package project
 
 import (
 	"fmt"
+	"time"
+
 	"github.com/haad/worktracker/sql"
-	//"github.com/haad/worktracker/model/entry"
 )
 
 type ProjectInt interface {
 	GetID() uint
 	GetName() string
+	GetEstimate() int64
+	GetEstimateString() string
+	GetWorkLoggedString() string
 	GetCustomerName() string
 }
 
-func ProjectCreate(name string, customerName string) {
+func ProjectCreate(name string, estimate string, customerName string) {
 	var customer sql.Customer
+	var est int64 = 0
+
 	if err := sql.GetCustomerByName(customerName, &customer); err != nil {
 		fmt.Println("Customer: ", customerName, "doesn't exist. Error: ", err.Error())
 		return
 	}
 
-	fmt.Println("Creating project:", name, "with default rate:", customer)
-	sql.DBc.Create(&sql.Project{Name: name, CustomerID: customer.GetID()})
+	if estimate != "" {
+		d, err := time.ParseDuration(estimate)
+		if err != nil {
+			panic(err)
+		}
+
+		est = int64(d.Seconds())
+	}
+
+	fmt.Println("Creating project:", name, "under customer:", customer)
+	sql.DBc.Create(&sql.Project{Name: name, Estimate: est, CustomerID: customer.GetID()})
+}
+
+func ProjectEdit(id uint, name string, estimate string) {
+	var project sql.Project
+
+	sql.DBc.Set("gorm:auto_preload", true).Where("ID = ?", id).First(&project)
+
+	if estimate != "" {
+		d, err := time.ParseDuration(estimate)
+		if err != nil {
+			panic(err)
+		}
+
+		project.Estimate = int64(d.Seconds())
+	}
+
+	if name != "" {
+		project.Name = name
+	}
+
+	fmt.Println("Editing project:", name, "with estimate:", estimate)
+	sql.DBc.Save(&project)
 }
 
 func ProjectDelete(id uint) {
