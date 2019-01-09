@@ -137,6 +137,22 @@ func GetProjectByName(customerName string, projectName string, project *Project)
 	return nil
 }
 
+func (p Project) MarshalJSON() ([]byte, error) {
+	basicProject := struct {
+		ID					uint `json:"id"`
+		Name        string `json:"name"`
+		Estimate    string `json:"estimate"`
+		LoggedTime  string `json:"logged_time"`
+	}{
+		ID:         p.GetID(),
+		Name:       p.Name,
+		Estimate:   p.GetEstimateString(),
+		LoggedTime: p.GetWorkLoggedString(),
+	}
+
+	return json.Marshal(basicProject)
+}
+
 // Entry definitions with it's Byters
 type Entry struct {
 	gorm.Model
