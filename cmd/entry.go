@@ -67,7 +67,7 @@ func init() {
 		Short: "List Entects",
 		Long:  `List created Entects`,
 		Run: func(cmd *cobra.Command, args []string) {
-			EntList(entProjectName, entCustomerName, entStart)
+			entList(entProjectName, entCustomerName, entStart)
 		},
 	}
 	entListCmd.Flags().StringVarP(&entProjectName, "project", "P", "", "Project to which entry belongs")
@@ -84,7 +84,7 @@ func init() {
 	entCmd.AddCommand(entListCmd)
 }
 
-func EntList(projectName string, customerName string, startDate string) {
+func entList(projectName string, customerName string, startDate string) {
 	var entries []entry.EntryInt
 
 	table := tablewriter.CreateTable()

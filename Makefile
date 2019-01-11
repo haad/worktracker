@@ -5,7 +5,7 @@ clean:
 	@rm -rf worktracker
 
 test:
-	@go test .
+	@go test ./wtime
 
 build:
 	@go build .

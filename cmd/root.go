@@ -30,6 +30,7 @@ var rootCmd = &cobra.Command{
 	my hours at the end of day. That's why worktracker doesn't support running timer.`,
 }
 
+// Execute runs parses cobra commands
 func Execute() {
 	if err := rootCmd.Execute(); err != nil {
 		fmt.Println(err)

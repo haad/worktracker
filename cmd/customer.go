@@ -68,7 +68,7 @@ func init() {
 		Short: "List customers",
 		Long:  `List created customers`,
 		Run: func(cmd *cobra.Command, args []string) {
-			CustomerList()
+			customerList()
 		},
 	}
 
@@ -79,7 +79,7 @@ func init() {
 	custCmd.AddCommand(custListCmd)
 }
 
-func CustomerList() {
+func customerList() {
 	var customers []customer.CustomerInt
 
 	table := tablewriter.CreateTable()
