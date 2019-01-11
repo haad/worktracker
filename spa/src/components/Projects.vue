@@ -24,8 +24,9 @@ export default {
     return {
       server_data: [],
       errors: [],
-      fields: [ {key: 'ID', sortable: true},
-                {key: 'Name', sortable: false},
+      fields: [ {key: 'id', sortable: true},
+                {key: 'name', sortable: false},
+                {key: 'logged_time', sortable: false},
               ]
     }
   },
