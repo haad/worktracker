@@ -3,6 +3,7 @@ package sql
 import (
 	"encoding/json"
 	"fmt"
+	"log"
 	"time"
 
 	"github.com/jinzhu/gorm"
@@ -139,15 +140,17 @@ func GetProjectByName(customerName string, projectName string, project *Project)
 
 func (p Project) MarshalJSON() ([]byte, error) {
 	basicProject := struct {
-		ID					uint `json:"id"`
-		Name        string `json:"name"`
-		Estimate    string `json:"estimate"`
-		LoggedTime  string `json:"logged_time"`
+		ID         uint    `json:"id"`
+		Name       string  `json:"name"`
+		Estimate   string  `json:"estimate"`
+		LoggedTime string  `json:"logged_time"`
+		Entries    []Entry `json:"entries`
 	}{
 		ID:         p.GetID(),
 		Name:       p.Name,
 		Estimate:   p.GetEstimateString(),
 		LoggedTime: p.GetWorkLoggedString(),
+		Entries:    p.Entries,
 	}
 
 	return json.Marshal(basicProject)
@@ -255,12 +258,12 @@ func DBInit(DbType string, DbPath string) {
 	DBc, err = gorm.Open(DbType, DbPath)
 	if err != nil {
 		DBc.Close()
-		panic("DB open Failed")
+		log.Fatalln(err)
 	}
 	//	defer db.Close()
 
 	// Migrate the schema
-	fmt.Println("Running database automigration...")
+	log.Println("Running database automigration...")
 	DBc.AutoMigrate(&Customer{}, &Project{}, &Entry{})
 
 	DBc.LogMode(false)
@@ -270,7 +273,7 @@ func DBInit(DbType string, DbPath string) {
 // TODO: Make sure we load only data which is needed when it's needed.
 func DBPreload() {
 
-	fmt.Println("Preloading database data if needed...")
+	log.Println("Preloading database data if needed...")
 
 	DBc.Where(Customer{Name: "Cra"}).FirstOrCreate(&Customer{Name: "Cra", Rate: 40,
 		ContactEmail: "pkouril@cra.cz", ContactName: "Premysl Kouril"})

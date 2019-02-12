@@ -2,10 +2,9 @@ package web
 
 import (
 	"encoding/json"
-	"fmt"
-
+	"go/build"
+	"log"
 	"net/http"
-
 	"os/exec"
 
 	"github.com/labstack/echo"
@@ -17,14 +16,19 @@ import (
 func StartServer(addr string) {
 	url := "http://" + addr + "/index.html"
 
+	worktrackerPkg, err := build.Import("github.com/haad/worktracker", "", build.FindOnly)
+	if err != nil {
+		log.Fatalln(err)
+	}
+
 	e := echo.New()
 
 	e.Pre(middleware.Rewrite(map[string]string{
 		"/app/*": "/index.html",
 	}))
 
-	e.Static("/static", "spa/dist/static")
-	e.Static("/", "spa/dist")
+	e.Static("/static", worktrackerPkg.Dir+"/spa/dist/static")
+	e.Static("/", worktrackerPkg.Dir+"/spa/dist")
 
 	// Middleware
 	e.Use(middleware.Logger())
@@ -35,7 +39,7 @@ func StartServer(addr string) {
 	//e.GET("/app/*", AppIndex)
 
 	// Start server
-	fmt.Printf("starting %s\n", url)
+	log.Println("starting ", url, "pkg ", worktrackerPkg.Dir)
 	exec.Command("open", url).Run()
 
 	e.Logger.Fatal(e.Start(addr))

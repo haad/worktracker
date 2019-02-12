@@ -65,10 +65,20 @@ header span {
   padding-top: 16px;
 }
 
-.customers {
+.customers_data {
   column-count: 1;
   column-gap: 1em;
   margin-top: 100px;
 }
 
+.second_nav {
+  column-count: 1;
+  column-gap: 1em;
+  margin-left: 20px;
+  line-height: 0.4;
+}
+
+.navbar-light a {
+  color: #000009;
+}
 </style>

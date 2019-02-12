@@ -1,7 +1,7 @@
 package customer
 
 import (
-	"fmt"
+	"log"
 
 	"github.com/haad/worktracker/model/project"
 	"github.com/haad/worktracker/sql"
@@ -16,14 +16,14 @@ type CustomerInt interface {
 }
 
 func CustomerCreate(name string, rate int, contact string, email string) {
-	fmt.Println("Creating customer:", name, "with default rate:", rate)
+	log.Println("Creating customer:", name, "with default rate:", rate)
 	sql.DBc.Create(&sql.Customer{Name: name, Rate: uint(rate), ContactEmail: email, ContactName: contact})
 }
 
 func CustomerEdit(name string, rate int, contact string, email string) {
 	var customer sql.Customer
 
-	fmt.Println("Editing customer:", name, "with default rate:", rate)
+	log.Println("Editing customer:", name, "with default rate:", rate)
 	sql.DBc.Set("gorm:auto_preload", true).Where("name = ?", name).First(&customer)
 
 	if rate >= 0 && uint(rate) != customer.GetRate() {
@@ -46,13 +46,13 @@ func CustomerDelete(name string) {
 
 	sql.DBc.Set("gorm:auto_preload", true).Where("name = ?", name).First(&customer)
 
-	fmt.Println("Deleting projects:")
+	log.Println("Deleting projects:")
 	for _, p := range customer.Projects {
 		project.ProjectDelete(p.GetID())
 		//		sql.DBc.Unscoped().Delete(&project)
 	}
 
-	fmt.Println("Deleting customer:", name)
+	log.Println("Deleting customer:", name)
 	sql.DBc.Unscoped().Delete(&customer)
 }
 

@@ -1,7 +1,7 @@
 package project
 
 import (
-	"fmt"
+	"log"
 	"time"
 
 	"github.com/haad/worktracker/sql"
@@ -21,7 +21,7 @@ func ProjectCreate(name string, estimate string, customerName string) {
 	var est int64 = 0
 
 	if err := sql.GetCustomerByName(customerName, &customer); err != nil {
-		fmt.Println("Customer: ", customerName, "doesn't exist. Error: ", err.Error())
+		log.Println("Customer: ", customerName, "doesn't exist. Error: ", err.Error())
 		return
 	}
 
@@ -34,7 +34,7 @@ func ProjectCreate(name string, estimate string, customerName string) {
 		est = int64(d.Seconds())
 	}
 
-	fmt.Println("Creating project:", name, "under customer:", customer)
+	log.Println("Creating project:", name, "under customer:", customer)
 	sql.DBc.Create(&sql.Project{Name: name, Estimate: est, CustomerID: customer.GetID()})
 }
 
@@ -56,7 +56,7 @@ func ProjectEdit(id uint, name string, estimate string) {
 		project.Name = name
 	}
 
-	fmt.Println("Editing project:", name, "with estimate:", estimate)
+	log.Println("Editing project:", name, "with estimate:", estimate)
 	sql.DBc.Save(&project)
 }
 
@@ -66,11 +66,11 @@ func ProjectDelete(id uint) {
 	sql.DBc.Set("gorm:auto_preload", true).Where("ID = ?", id).First(&project)
 
 	for _, entry := range project.Entries {
-		fmt.Println("Deleting entry:", entry.GetName())
+		log.Println("Deleting entry:", entry.GetName())
 		sql.DBc.Unscoped().Delete(&entry)
 	}
 
-	fmt.Println("Deleting project:", project.GetName())
+	log.Println("Deleting project:", project.GetName())
 	sql.DBc.Unscoped().Delete(&project)
 }
 
@@ -81,8 +81,7 @@ func ProjectList(customerName string) []ProjectInt {
 
 	if customerName != "" {
 		if err := sql.GetCustomerByName(customerName, &customer); err != nil {
-			fmt.Println("Customer: ", customerName, "doesn't exist. Error: ", err.Error())
-			panic("")
+			log.Fatalln("Customer: ", customerName, "doesn't exist. Error: ", err.Error())
 		}
 
 		sql.DBc.Set("gorm:auto_preload", true).Where("customer_id = ?", customer.GetID()).Find(&projects)

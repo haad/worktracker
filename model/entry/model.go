@@ -1,7 +1,7 @@
 package entry
 
 import (
-	"fmt"
+	"log"
 	"time"
 
 	"github.com/haad/worktracker/sql"
@@ -24,7 +24,6 @@ func EntCreate(name string, desc string, dura string, startDate string, projectN
 	billable bool, tags string) {
 	var project sql.Project
 
-	fmt.Println(startDate, sql.ShortForm)
 	if startDate == "" {
 		startDate = time.Now().Format(sql.ShortForm)
 	}
@@ -40,11 +39,11 @@ func EntCreate(name string, desc string, dura string, startDate string, projectN
 	}
 
 	if err := sql.GetProjectByName(customerName, projectName, &project); err != nil {
-		fmt.Println("Project: ", projectName, "with customer: ", customerName, "not found. Error:", err.Error())
+		log.Println("Project: ", projectName, "with customer: ", customerName, "not found. Error:", err.Error())
 		return
 	}
 
-	fmt.Println("Creating entry for a project: ", project.GetName(), "on customer: ", project.GetCustomerName())
+	log.Println("Creating entry for a project: ", project.GetName(), "on customer: ", project.GetCustomerName())
 	sql.DBc.Create(&sql.Entry{Name: name, Desc: desc, StartDate: startD.Unix(), Duration: int64(d.Seconds()), Billable: billable, ProjectID: project.ID})
 }
 
@@ -53,7 +52,7 @@ func EntDelete(id uint) {
 
 	sql.DBc.Where("ID = ?", id).First(&entry)
 
-	fmt.Println("Deleting entry:", entry.GetName())
+	log.Println("Deleting entry:", entry.GetName())
 	sql.DBc.Unscoped().Delete(&entry)
 }
 
@@ -65,9 +64,7 @@ func EntList(projectName string, customerName string, startDate string) []EntryI
 
 	if projectName != "" && customerName != "" {
 		if err := sql.GetProjectByName(customerName, projectName, &project); err != nil {
-			fmt.Println("Project: ", projectName, "with customer: ", customerName, "not found. Error:", err.Error())
-			// XXX: fix error handling
-			panic("")
+			log.Fatalln("Project: ", projectName, "with customer: ", customerName, "not found. Error:", err.Error())
 		}
 
 		sql.DBc.Set("gorm:auto_preload", true).Where("project_id = ?", project.GetID()).Find(&entries)
