@@ -1,0 +1,6 @@
+
+
+1) Make sure we can print project sumarry for a given date selector
+2) Add tags to entries and make sure we can select entries and get project summaries based on tags
+3) Add some graphs to worktracker web ui
+4) Add total sum as Table Footer for entries and Projects list
