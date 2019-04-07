@@ -14,6 +14,7 @@ type ProjectInt interface {
 	GetEstimateString() string
 	GetWorkLoggedString() string
 	GetCustomerName() string
+	GetFinished() bool
 }
 
 func ProjectCreate(name string, estimate string, customerName string) {
@@ -38,7 +39,7 @@ func ProjectCreate(name string, estimate string, customerName string) {
 	sql.DBc.Create(&sql.Project{Name: name, Estimate: est, CustomerID: customer.GetID()})
 }
 
-func ProjectEdit(id uint, name string, estimate string) {
+func ProjectEdit(id uint, name string, estimate string, finished bool) {
 	var project sql.Project
 
 	sql.DBc.Set("gorm:auto_preload", true).Where("ID = ?", id).First(&project)
@@ -55,6 +56,8 @@ func ProjectEdit(id uint, name string, estimate string) {
 	if name != "" {
 		project.Name = name
 	}
+
+	project.Finished = finished
 
 	log.Println("Editing project:", name, "with estimate:", estimate)
 	sql.DBc.Save(&project)
@@ -74,7 +77,7 @@ func ProjectDelete(id uint) {
 	sql.DBc.Unscoped().Delete(&project)
 }
 
-func ProjectList(customerName string) []ProjectInt {
+func ProjectList(customerName string, includeFinished bool) []ProjectInt {
 	var projects []sql.Project
 	var pint []ProjectInt
 	var customer sql.Customer
@@ -90,7 +93,9 @@ func ProjectList(customerName string) []ProjectInt {
 	}
 
 	for _, p := range projects {
-		pint = append(pint, p)
+		if !p.GetFinished() || includeFinished {
+			pint = append(pint, p)
+		}
 	}
 
 	return pint

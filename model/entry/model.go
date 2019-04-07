@@ -73,7 +73,7 @@ func EntList(projectName string, customerName string, startDate string) []EntryI
 	}
 
 	for _, e := range entries {
-		// if startDate fileter string was provided use it, to fileter entries visible to user
+		// if startDate filter string was provided use it, to filter entries visible to user
 		if startDate != "" {
 			if wtime.CompareStartDate(startDate, e.GetSDate()) {
 				eint = append(eint, e)

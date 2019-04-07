@@ -13,6 +13,7 @@ func init() {
 	var projName string
 	var projCustName string
 	var projEstimate string
+	var projFinished bool
 
 	var projID uint
 
@@ -42,12 +43,13 @@ func init() {
 		Short: "Edit project with given name",
 		Long:  `Edit project which belongs to one customer`,
 		Run: func(cmd *cobra.Command, args []string) {
-			project.ProjectEdit(projID, projName, projEstimate)
+			project.ProjectEdit(projID, projName, projEstimate, projFinished)
 		},
 	}
 	projEditCmd.Flags().UintVarP(&projID, "id", "i", 0, "ID of project to delete")
 	projEditCmd.Flags().StringVarP(&projName, "name", "n", "", "Project name")
 	projEditCmd.Flags().StringVarP(&projEstimate, "estimate", "e", "", "Project hour estimate, valid units are s/m/h")
+	projEditCmd.Flags().BoolVarP(&projFinished, "finished", "f", false, "Is project finished ?")
 	projEditCmd.MarkFlagRequired("id")
 
 	var projDelCmd = &cobra.Command{
@@ -66,10 +68,11 @@ func init() {
 		Short: "List projects",
 		Long:  `List created projects`,
 		Run: func(cmd *cobra.Command, args []string) {
-			projectList(projCustName)
+			projectList(projCustName, projFinished)
 		},
 	}
 	projListCmd.Flags().StringVarP(&projCustName, "customer", "c", "", "Project customer name.")
+	projListCmd.Flags().BoolVarP(&projFinished, "finished", "F", false, "Include finished projects in a list.")
 
 	rootCmd.AddCommand(projCmd)
 	projCmd.AddCommand(projCreateCmd)
@@ -78,17 +81,17 @@ func init() {
 	projCmd.AddCommand(projListCmd)
 }
 
-func projectList(customerName string) {
+func projectList(customerName string, includeFinished bool) {
 	var projects []project.ProjectInt
 
 	table := tablewriter.CreateTable()
-	table.AddHeaders("ID", "Project Name", "Customer", "Original Estimate", "Work Logged")
+	table.AddHeaders("ID", "Project Name", "Customer", "Finished", "Original Estimate", "Work Logged")
 	table.AddTitle("Projects List")
 
-	projects = project.ProjectList(customerName)
+	projects = project.ProjectList(customerName, includeFinished)
 
 	for _, p := range projects {
-		table.AddRow(p.GetID(), p.GetName(), p.GetCustomerName(), p.GetEstimateString(), p.GetWorkLoggedString())
+		table.AddRow(p.GetID(), p.GetName(), p.GetCustomerName(), p.GetFinished(), p.GetEstimateString(), p.GetWorkLoggedString())
 	}
 
 	fmt.Println(table.Render())

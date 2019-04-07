@@ -33,7 +33,7 @@ func GetStartEndMonth(startD time.Time) (int64, int64) {
 		eyear = startD.Year() + 1
 	}
 
-	start := time.Date(startD.Year(), startD.Month(), 0, 0, 0, 0, 0, time.UTC).Unix()
+	start := time.Date(startD.Year(), startD.Month(), 0, 0, 0, 0, 1, time.UTC).Unix()
 	end := time.Date(eyear, emonth, 0, 0, 0, 0, 0, time.UTC).Unix()
 
 	return start, end

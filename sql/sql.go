@@ -69,6 +69,7 @@ type Project struct {
 	gorm.Model
 	Name     string
 	Estimate int64
+	Finished bool `gorm:"default:false"`
 
 	CustomerID uint `json:"-"`
 
@@ -136,6 +137,11 @@ func GetProjectByName(customerName string, projectName string, project *Project)
 	}
 
 	return nil
+}
+
+// Get Finished flag.
+func (p Project) GetFinished() bool {
+	return p.Finished
 }
 
 func (p Project) MarshalJSON() ([]byte, error) {
