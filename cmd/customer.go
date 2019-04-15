@@ -23,6 +23,17 @@ func init() {
 		Long:    `Create/Update/List/Delete customers`,
 	}
 
+	var custSelectCmd = &cobra.Command{
+		Use:   "select",
+		Short: "Select customer with given name",
+		Long:  `Select existing customers`,
+		Run: func(cmd *cobra.Command, args []string) {
+			customerSelect(customerName)
+		},
+	}
+	custSelectCmd.Flags().StringVarP(&customerName, "name", "n", "", "customer name to work with")
+	custSelectCmd.MarkFlagRequired("name")
+
 	var custCreateCmd = &cobra.Command{
 		Use:   "create",
 		Short: "Create customer with given name",
@@ -77,6 +88,13 @@ func init() {
 	custCmd.AddCommand(custEditCmd)
 	custCmd.AddCommand(custDeleteCmd)
 	custCmd.AddCommand(custListCmd)
+	custCmd.AddCommand(custSelectCmd)
+}
+
+func customerSelect(customerName string) {
+	if customer.CustomerCheckName(customerName) {
+		// Save current selection to config file.
+	}
 }
 
 func customerList() {

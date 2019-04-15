@@ -48,7 +48,7 @@ func initConfig() {
 // Customer model for keeping info about given customer
 func main() {
 
-	//initConfig()
+	initConfig()
 	// Find home directory.
 	home, err := homedir.Dir()
 	if err != nil {

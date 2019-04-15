@@ -68,3 +68,16 @@ func CustomerList() []CustomerInt {
 
 	return cint
 }
+
+func CustomerCheckName(name string) bool {
+	var customer sql.Customer
+
+	log.Println("Checking customer:", name)
+
+	if err := sql.GetCustomerByName(name, &customer); err != nil {
+		log.Println("Customer: ", name, "doesn't exist. Error: ", err.Error())
+		return false
+	}
+
+	return true
+}
