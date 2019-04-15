@@ -32,7 +32,7 @@ func init() {
 	var entCreateCmd = &cobra.Command{
 		Use:     "create",
 		Aliases: []string{"log", "l"},
-		Short:   "Create customer with given name",
+		Short:   "Create Entry for given project",
 		Long:    `Log some work done for a given project`,
 		Run: func(cmd *cobra.Command, at []string) {
 			entry.EntCreate(entName, entDesc, entDura, entStart, entProjectName, entCustomerName, entBillable, entTags)
@@ -53,8 +53,8 @@ func init() {
 
 	var entDelCmd = &cobra.Command{
 		Use:   "delete",
-		Short: "Delete Entects",
-		Long:  `Delete created Entect`,
+		Short: "Delete Entry",
+		Long:  `Delete Entry`,
 		Run: func(cmd *cobra.Command, args []string) {
 			entry.EntDelete(entID)
 		},
@@ -64,8 +64,8 @@ func init() {
 
 	var entListCmd = &cobra.Command{
 		Use:   "list",
-		Short: "List Entects",
-		Long:  `List created Entects`,
+		Short: "List Entries",
+		Long:  `List created Entries`,
 		Run: func(cmd *cobra.Command, args []string) {
 			entList(entProjectName, entCustomerName, entStart)
 		},
