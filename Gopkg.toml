@@ -47,7 +47,7 @@
 
 [[constraint]]
   branch = "master"
-  name = "github.com/xlab/tablewriter"
+  name = "github.com/olekukonko/tablewriter"
 
 [prune]
   go-tests = true

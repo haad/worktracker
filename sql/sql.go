@@ -109,6 +109,16 @@ func (p Project) GetEstimateString() string {
 	return wtime.GetDurantionString(p.Estimate)
 }
 
+func (p Project) GetWorkLogged() int64 {
+	var workedTime int64 = 0
+
+	for _, entry := range p.Entries {
+		workedTime += entry.GetDuration()
+	}
+
+	return workedTime
+}
+
 func (p Project) GetWorkLoggedString() string {
 	var workedTime int64 = 0
 
@@ -134,6 +144,16 @@ func GetProjectByName(customerName string, projectName string, project *Project)
 
 	if DBc.Where("name = ? AND customer_id = ?", projectName, customer.GetID()).First(project).RecordNotFound() {
 		return fmt.Errorf("project name %s for customer %s is missing ", projectName, customerName)
+	}
+
+	return nil
+}
+
+// GetProjectByID searchs for a project by it's ID and customer's ID to whitch it belongs
+func GetProjectByID(projectID uint, project *Project) error {
+
+	if DBc.Where("id = ?", projectID).First(project).RecordNotFound() {
+		return fmt.Errorf("project with id %s was not found.. ", projectID)
 	}
 
 	return nil

@@ -16,6 +16,7 @@ func GetDurantionString(duration int64) string {
 	if err != nil {
 		return ""
 	}
+
 	return d.String()
 }
 

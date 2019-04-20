@@ -16,6 +16,8 @@ package main
 
 import (
 	"fmt"
+	"io"
+	"log"
 	"os"
 
 	homedir "github.com/mitchellh/go-homedir"
@@ -45,10 +47,30 @@ func initConfig() {
 	}
 }
 
+func backupDB(sourceDB string, backupDB string) {
+	from, err := os.Open(sourceDB)
+	if err != nil {
+		log.Fatal(err)
+	}
+	defer from.Close()
+
+	to, err := os.OpenFile(backupDB, os.O_RDWR|os.O_CREATE, 0666)
+	if err != nil {
+		log.Fatal(err)
+	}
+	defer to.Close()
+
+	_, err = io.Copy(to, from)
+	if err != nil {
+		log.Fatal(err)
+	}
+
+}
+
 // Customer model for keeping info about given customer
 func main() {
 
-	//initConfig()
+	// initConfig()
 	// Find home directory.
 	home, err := homedir.Dir()
 	if err != nil {
@@ -56,7 +78,13 @@ func main() {
 		os.Exit(1)
 	}
 
-	sql.DBInit("sqlite3", home+"/.worktracker/"+"worktracker.db")
+	dbfile := home + "/.worktracker/" + "worktracker.db"
+	backupfile := dbfile + ".backup"
+
+	// Backup db on first run to make sure we have a copy
+	backupDB(dbfile, backupfile)
+
+	sql.DBInit("sqlite3", dbfile)
 	sql.DBPreload()
 
 	cmd.Execute()

@@ -1,10 +1,11 @@
 package cmd
 
 import (
-	"fmt"
+	"os"
+	"strconv"
 
+	"github.com/olekukonko/tablewriter"
 	"github.com/spf13/cobra"
-	"github.com/xlab/tablewriter"
 
 	"github.com/haad/worktracker/model/customer"
 )
@@ -82,14 +83,14 @@ func init() {
 func customerList() {
 	var customers []customer.CustomerInt
 
-	table := tablewriter.CreateTable()
-	table.AddHeaders("ID", "Customer Name", "Rate", "Contact Name", "Contact Email")
-	table.AddTitle("Customer List")
+	table := tablewriter.NewWriter(os.Stdout)
+	table.SetHeader([]string{"ID", "Customer Name", "Rate", "Contact Name", "Contact Email"})
+	// table.AddTitle("Customer List")
 
 	customers = customer.CustomerList()
 
 	for _, c := range customers {
-		table.AddRow(c.GetID(), c.GetName(), c.GetRate(), c.GetContactName(), c.GetContactEmail())
+		table.Append([]string{strconv.FormatUint(uint64(c.GetID()), 10), c.GetName(), string(c.GetRate()), c.GetContactName(), c.GetContactEmail()})
 	}
-	fmt.Println(table.Render())
+	table.Render()
 }

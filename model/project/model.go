@@ -12,6 +12,7 @@ type ProjectInt interface {
 	GetName() string
 	GetEstimate() int64
 	GetEstimateString() string
+	GetWorkLogged() int64
 	GetWorkLoggedString() string
 	GetCustomerName() string
 	GetFinished() bool

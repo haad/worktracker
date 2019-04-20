@@ -112,6 +112,14 @@
   version = "v0.0.4"
 
 [[projects]]
+  digest = "1:0356f3312c9bd1cbeda81505b7fd437501d8e778ab66998ef69f00d7f9b3a0d7"
+  name = "github.com/mattn/go-runewidth"
+  packages = ["."]
+  pruneopts = "UT"
+  revision = "3ee7d812e62a0804a7d0a324e0249ca2db3476d3"
+  version = "v0.0.4"
+
+[[projects]]
   digest = "1:4a49346ca45376a2bba679ca0e83bec949d780d4e927931317904bad482943ec"
   name = "github.com/mattn/go-sqlite3"
   packages = ["."]
@@ -134,6 +142,14 @@
   pruneopts = "UT"
   revision = "3536a929edddb9a5b34bd6861dc4a9647cb459fe"
   version = "v1.1.2"
+
+[[projects]]
+  branch = "master"
+  digest = "1:86a60f7a48703e422b7ce0a859cf6a50d0aeeb9685cc873d0fa016141973b2fe"
+  name = "github.com/olekukonko/tablewriter"
+  packages = ["."]
+  pruneopts = "UT"
+  revision = "7e037d187b0c13d81ccf0dd1c6b990c2759e6597"
 
 [[projects]]
   digest = "1:95741de3af260a92cc5c7f3f3061e85273f5a81b5db20d4bd68da74bd521675e"
@@ -212,14 +228,6 @@
 
 [[projects]]
   branch = "master"
-  digest = "1:e21411c7bd137752c038c0b68c7289e5da64f78001d92db9fdc071d7a4683472"
-  name = "github.com/xlab/tablewriter"
-  packages = ["."]
-  pruneopts = "UT"
-  revision = "80b567a11ad5f14be3e044545e463d16f0a91d78"
-
-[[projects]]
-  branch = "master"
   digest = "1:e3d2db9bc633f4635e6418caf0b0734c43821ecd59105d1798458c6ae4d227fd"
   name = "golang.org/x/crypto"
   packages = [
@@ -269,9 +277,9 @@
     "github.com/labstack/echo",
     "github.com/labstack/echo/middleware",
     "github.com/mitchellh/go-homedir",
+    "github.com/olekukonko/tablewriter",
     "github.com/spf13/cobra",
     "github.com/spf13/viper",
-    "github.com/xlab/tablewriter",
   ]
   solver-name = "gps-cdcl"
   solver-version = 1

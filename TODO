@@ -4,10 +4,7 @@ ShortTerm UI fixes:
 
 1) Make sure we can print project summary for a given date selector
 3) Make sure we can select multiple projects with a list of ids or a regexp provided for project name
-4) Add total sum as Table Footer for entries and Projects list
 5) Add ability to globally select particular customer so -c will not be required all the time
-6) Make sure project name can be specified as a ID also
-7) Add option to create SQLITE backup after run.
 
 Longterm Tasks:
 2) Add tags to entries and make sure we can select entries and get project summaries based on tags

@@ -20,7 +20,7 @@ type EntryInt interface {
 	GetProjectName() string
 }
 
-func EntCreate(name string, desc string, dura string, startDate string, projectName string, customerName string,
+func EntCreate(name string, desc string, dura string, startDate string, projectID uint,
 	billable bool, tags string) {
 	var project sql.Project
 
@@ -38,8 +38,8 @@ func EntCreate(name string, desc string, dura string, startDate string, projectN
 		panic(err)
 	}
 
-	if err := sql.GetProjectByName(customerName, projectName, &project); err != nil {
-		log.Println("Project: ", projectName, "with customer: ", customerName, "not found. Error:", err.Error())
+	if err := sql.GetProjectByID(projectID, &project); err != nil {
+		log.Println("Project with id: ", projectID, "not found. Error:", err.Error())
 		return
 	}
 
@@ -56,19 +56,14 @@ func EntDelete(id uint) {
 	sql.DBc.Unscoped().Delete(&entry)
 }
 
-func EntList(projectName string, customerName string, startDate string) []EntryInt {
+func EntList(projectID uint, startDate string) []EntryInt {
 	var entries []sql.Entry
 	var eint []EntryInt
 
-	var project sql.Project
+	// Try to select all entries for a given projectID if it doesn't exist print all
+	if sql.DBc.Set("gorm:auto_preload", true).Where("project_id = ?", projectID).Find(&entries).RecordNotFound() {
+		log.Println("Entries with project id: ", projectID, "not found.")
 
-	if projectName != "" && customerName != "" {
-		if err := sql.GetProjectByName(customerName, projectName, &project); err != nil {
-			log.Fatalln("Project: ", projectName, "with customer: ", customerName, "not found. Error:", err.Error())
-		}
-
-		sql.DBc.Set("gorm:auto_preload", true).Where("project_id = ?", project.GetID()).Find(&entries)
-	} else {
 		sql.DBc.Set("gorm:auto_preload", true).Find(&entries)
 	}
 

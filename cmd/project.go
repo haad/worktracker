@@ -1,12 +1,14 @@
 package cmd
 
 import (
-	"fmt"
+	"os"
+	"strconv"
 
+	"github.com/olekukonko/tablewriter"
 	"github.com/spf13/cobra"
-	"github.com/xlab/tablewriter"
 
 	"github.com/haad/worktracker/model/project"
+	"github.com/haad/worktracker/wtime"
 )
 
 func init() {
@@ -83,16 +85,24 @@ func init() {
 
 func projectList(customerName string, includeFinished bool) {
 	var projects []project.ProjectInt
+	var timeSum int64
 
-	table := tablewriter.CreateTable()
-	table.AddHeaders("ID", "Project Name", "Customer", "Finished", "Original Estimate", "Work Logged")
-	table.AddTitle("Projects List")
+	table := tablewriter.NewWriter(os.Stdout)
+
+	table.SetHeader([]string{"Customer", "ID", "Project Name", "Finished", "Original Estimate", "Work Logged"})
+
+	// table.AddTitle("Projects List")
+	// table.SetAutoMergeCells(true)
 
 	projects = project.ProjectList(customerName, includeFinished)
 
 	for _, p := range projects {
-		table.AddRow(p.GetID(), p.GetName(), p.GetCustomerName(), p.GetFinished(), p.GetEstimateString(), p.GetWorkLoggedString())
+		table.Append([]string{strconv.FormatUint(uint64(p.GetID()), 10), p.GetName(), p.GetCustomerName(),
+			strconv.FormatBool(p.GetFinished()), p.GetEstimateString(), p.GetWorkLoggedString()})
+		timeSum += p.GetWorkLogged()
 	}
 
-	fmt.Println(table.Render())
+	table.SetFooter([]string{"", "", "", "Worked hours", "", wtime.GetDurantionString(timeSum)})
+
+	table.Render()
 }

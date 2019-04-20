@@ -1,13 +1,14 @@
 package cmd
 
 import (
-	"fmt"
-	//"time"
+	"os"
+	"strconv"
 
+	"github.com/olekukonko/tablewriter"
 	"github.com/spf13/cobra"
-	"github.com/xlab/tablewriter"
 
 	"github.com/haad/worktracker/model/entry"
+	"github.com/haad/worktracker/wtime"
 )
 
 func init() {
@@ -17,8 +18,7 @@ func init() {
 	var entStart string
 	var entBillable bool
 	var entTags string
-	var entProjectName string
-	var entCustomerName string
+	var entProjectID uint
 
 	var entID uint
 
@@ -35,21 +35,19 @@ func init() {
 		Short:   "Create Entry for given project",
 		Long:    `Log some work done for a given project`,
 		Run: func(cmd *cobra.Command, at []string) {
-			entry.EntCreate(entName, entDesc, entDura, entStart, entProjectName, entCustomerName, entBillable, entTags)
+			entry.EntCreate(entName, entDesc, entDura, entStart, entProjectID, entBillable, entTags)
 		},
 	}
 
 	entCreateCmd.Flags().StringVarP(&entName, "name", "n", "", "Entry short name")
 	entCreateCmd.Flags().StringVarP(&entDesc, "desc", "D", "", "Entry description.")
-	entCreateCmd.Flags().StringVarP(&entProjectName, "project", "P", "", "Project to which entry belongs")
-	entCreateCmd.Flags().StringVarP(&entCustomerName, "customer", "c", "", "Customer to which entry belongs")
+	entCreateCmd.Flags().UintVarP(&entProjectID, "id", "i", 0, "ID of project to delete")
 	entCreateCmd.Flags().StringVarP(&entDura, "duration", "u", "", "Duration of existing entry, valid units are s/m/h")
 	entCreateCmd.Flags().StringVarP(&entStart, "start", "s", "", "Start date of work in format DD/MM/YYYY")
 	entCreateCmd.Flags().BoolVarP(&entBillable, "billable", "B", true, "Is entry billable.")
 	entCreateCmd.Flags().StringVarP(&entTags, "tags", "t", "", "Comma separated list of tags.")
 	entCreateCmd.MarkFlagRequired("name")
 	entCreateCmd.MarkFlagRequired("duration")
-	entCreateCmd.MarkFlagRequired("project")
 
 	var entDelCmd = &cobra.Command{
 		Use:   "delete",
@@ -67,11 +65,10 @@ func init() {
 		Short: "List Entries",
 		Long:  `List created Entries`,
 		Run: func(cmd *cobra.Command, args []string) {
-			entList(entProjectName, entCustomerName, entStart)
+			entList(entProjectID, entStart)
 		},
 	}
-	entListCmd.Flags().StringVarP(&entProjectName, "project", "P", "", "Project to which entry belongs")
-	entListCmd.Flags().StringVarP(&entCustomerName, "customer", "c", "", "Customer to which entry belongs")
+	entListCmd.Flags().UintVarP(&entProjectID, "id", "i", 0, "ID of project to delete")
 	entListCmd.Flags().StringVarP(&entStart, "date", "d", "", `Date string in following format @<>= MM/YYYY,
     to select entries with start date before use --date <10/2018,
     to select entries with start date after use --date >10/2018,
@@ -84,18 +81,23 @@ func init() {
 	entCmd.AddCommand(entListCmd)
 }
 
-func entList(projectName string, customerName string, startDate string) {
+func entList(projectID uint, startDate string) {
 	var entries []entry.EntryInt
+	var timeSum int64
 
-	table := tablewriter.CreateTable()
-	table.AddHeaders("ID", "Entry Name", "Start Date", "Duration", "Desc", "Project Name", "Customer Name")
-	table.AddTitle("Entries List")
+	table := tablewriter.NewWriter(os.Stdout)
+	table.SetHeader([]string{"ID", "Entry Name", "Start Date", "Duration", "Desc", "Project Name", "Customer Name"})
+	//	table.AddTitle("Entries List")
+	table.SetAlignment(tablewriter.ALIGN_LEFT)
 
-	entries = entry.EntList(projectName, customerName, startDate)
+	entries = entry.EntList(projectID, startDate)
 
 	for _, e := range entries {
-		table.AddRow(e.GetID(), e.GetName(), e.GetSDateString(), e.GetDurationString(), e.GetDesc(),
-			e.GetProjectName(), e.GetCustomerName())
+		table.Append([]string{strconv.FormatUint(uint64(e.GetID()), 10), e.GetName(), e.GetSDateString(), e.GetDurationString(), e.GetDesc(),
+			e.GetProjectName(), e.GetCustomerName()})
+		timeSum += e.GetDuration()
 	}
-	fmt.Println(table.Render())
+	table.SetFooter([]string{"", "", "", "", "Worked hours", "", wtime.GetDurantionString(timeSum)})
+
+	table.Render()
 }
