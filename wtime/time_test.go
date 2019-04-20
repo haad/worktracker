@@ -6,6 +6,18 @@ import (
 	"time"
 )
 
+func TestGetDurantionString(t *testing.T) {
+	testDurations := [...]int64{60, 3600, 86400, 604800}
+	testDurationStrings := [...]string{"1m0s", "1h0m0s", "24h0m0s", "168h0m0s"}
+
+	for i := 0; i < len(testDurations); i++ {
+		t.Logf("Testing entry: %d", testDurations[i])
+		if GetDurantionString(testDurations[i]) != testDurationStrings[i] {
+			t.Errorf("GetDurantionString failed, expected %s got: %s", testDurationStrings[i], GetDurantionString(testDurations[i]))
+		}
+	}
+}
+
 func TestCompareStartDate(t *testing.T) {
 	shortForm := "02/01/2006"
 	dateForm := "01/2006"
@@ -22,8 +34,6 @@ func TestCompareStartDate(t *testing.T) {
 			t.Errorf("GetStartEndMonth failed, expected %t got: %t", testResults[i], CompareStartDate(testDateSpecs[i], sd.Unix()))
 		}
 	}
-
-	t.Logf("Testing @")
 	if CompareStartDate("@", time.Now().Unix()) != true {
 		t.Errorf("GetStartEndMonth failed, expected %t got: %t", true,
 			CompareStartDate(time.Now().Format(dateForm), time.Now().Unix()))
