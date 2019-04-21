@@ -67,7 +67,6 @@ func backupDB(sourceDB string, backupDB string) {
 
 }
 
-// Customer model for keeping info about given customer
 func main() {
 
 	// initConfig()
