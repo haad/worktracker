@@ -7,6 +7,7 @@ import (
 	"time"
 )
 
+//DateForm basic date format
 const DateForm = "01/2006"
 
 // GetDurantionString returns duration converted to a string with s/m/h
@@ -40,7 +41,7 @@ func GetStartEndMonth(startD time.Time) (int64, int64) {
 	return start, end
 }
 
-// XXX Error Handling
+// CompareStartDate @todo Add Error Handling
 func CompareStartDate(startDate string, entryDate int64) bool {
 	var sd time.Time
 	var err error
