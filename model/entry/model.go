@@ -63,7 +63,10 @@ func EntList(projectID uint, startDate string) []EntryInt {
 	// Try to select all entries for a given projectID if it doesn't exist print all
 	if sql.DBc.Set("gorm:auto_preload", true).Where("project_id = ?", projectID).Find(&entries).RecordNotFound() {
 		log.Println("Entries with project id: ", projectID, "not found.")
+	}
 
+	// projectID zero is not defined
+	if projectID == 0 {
 		sql.DBc.Set("gorm:auto_preload", true).Find(&entries)
 	}
 
