@@ -65,7 +65,7 @@ func CompareStartDate(startDate string, entryDate int64) bool {
 		}
 	case "=":
 		start, end := GetStartEndMonth(sd)
-		if entryDate >= start && entryDate < end {
+		if entryDate >= (start+1) && entryDate < end {
 			return true
 		}
 	case "@":

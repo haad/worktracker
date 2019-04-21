@@ -2,7 +2,6 @@ package wtime
 
 import (
 	"testing"
-	//"fmt"
 	"time"
 )
 
@@ -22,9 +21,9 @@ func TestCompareStartDate(t *testing.T) {
 	shortForm := "02/01/2006"
 	dateForm := "01/2006"
 
-	testEntryDates := [...]string{"02/11/2018", "05/10/2017", "24/09/2018", "12/01/2019", "29/12/2017", "29/12/2017"}
-	testDateSpecs := [...]string{"<12/2018", ">10/2017", "=09/2018", "=02/2019", "<01/2018", "<01/2017"}
-	testResults := [...]bool{true, true, true, false, true, false}
+	testEntryDates := [...]string{"02/11/2018", "05/10/2017", "24/09/2018", "12/01/2019", "29/12/2017", "29/12/2017", "28/02/2019"}
+	testDateSpecs := [...]string{"<12/2018", ">10/2017", "=09/2018", "=02/2019", "<01/2018", "<01/2017", "=03/2019"}
+	testResults := [...]bool{true, true, true, false, true, false, false}
 
 	for i := 0; i < len(testEntryDates); i++ {
 		t.Logf("Testing entry: %s", testEntryDates[i])
