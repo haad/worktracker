@@ -169,11 +169,13 @@ func (p Project) MarshalJSON() ([]byte, error) {
 		ID         uint    `json:"id"`
 		Name       string  `json:"name"`
 		Estimate   string  `json:"estimate"`
+		Finished   bool    `json:"finished"`
 		LoggedTime string  `json:"logged_time"`
 		Entries    []Entry `json:"entries`
 	}{
 		ID:         p.GetID(),
 		Name:       p.Name,
+		Finished:   p.GetFinished(),
 		Estimate:   p.GetEstimateString(),
 		LoggedTime: p.GetWorkLoggedString(),
 		Entries:    p.Entries,

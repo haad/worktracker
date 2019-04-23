@@ -26,7 +26,10 @@ export default {
       errors: [],
       fields: [ {key: 'id', sortable: true},
                 {key: 'name', sortable: false},
-                {key: 'logged_time', sortable: false},
+                {key: 'finished', sortable: false},
+                {key: 'estimate', sortable: true},
+                {key: 'logged_time', sortable: true},
+
               ]
     }
   },
